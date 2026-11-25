@@ -24,8 +24,9 @@ done
 
 if $sync; then
   # Upstream has no nightly branch: each nightly is a tag cut from main. Merge the newest one.
+  # awk reads to the end: closing the pipe early would fail the script under pipefail.
   tag=$(git ls-remote --tags --sort=-v:refname upstream 'refs/tags/v*-nightly.*' |
-    grep -v '\^{}' | head -1 | sed 's#.*refs/tags/##')
+    awk '!/\^\{\}/ && !t { sub(/.*refs\/tags\//, ""); t = $0 } END { print t }')
   [ -n "$tag" ] || { echo "no upstream nightly tag found" >&2; exit 1; }
   git fetch --no-tags upstream "refs/tags/$tag:refs/tags/$tag"
   # Stops on conflicts: resolve, commit, then rerun without --sync.
