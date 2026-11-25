@@ -127,6 +127,27 @@ describe("opening a workspace tab", () => {
     }
   });
 
+  it("reopens the remembered issue beside the Issues list with columns", () => {
+    const issue = {
+      key: "issue",
+      name: "Issue",
+      params: {
+        environmentId: "env",
+        projectId: "project",
+        tracker: "github",
+        scope: "o/r",
+        issueKey: "12",
+      },
+    };
+    const state = { routes: [home, issue] };
+    const selections = workspaceSelectionsIn(state.routes, {});
+    expect(names(workspaceTabNavigationState(state, "issues", selections, columns))).toEqual([
+      "Home",
+      "Issue",
+    ]);
+    expect(workspaceTabPage(state, "issues", selections, columns)?.key).toBe("issue");
+  });
+
   it("keeps the route that is already open, so re-selecting a tab doesn't rebuild it", () => {
     const next = workspaceTabNavigationState(
       { routes: [home, thread] },
