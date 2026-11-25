@@ -1,20 +1,11 @@
-import { useAtomValue } from "@effect/atom-react";
 import type { EnvironmentId, ProjectId, Snippet } from "@t3tools/contracts";
-import { createModelSelection } from "@t3tools/shared/model";
 import { T, useGT } from "gt-react";
-import { PencilIcon, PlayIcon, PlusIcon, Trash2Icon, XIcon, Zap } from "lucide-react";
+import { PencilIcon, PlayIcon, PlusIcon, Trash2Icon, Zap } from "lucide-react";
 import { useState } from "react";
 
-import {
-  updateClientSettings,
-  useClientSettings,
-  useEnvironmentSettings,
-} from "~/hooks/useSettings";
+import { updateClientSettings, useClientSettings } from "~/hooks/useSettings";
 import { randomUUID } from "~/lib/utils";
-import { getCustomModelOptionsByInstance } from "../../modelSelection";
-import { providerInstanceEntriesFor } from "../../providerInstances";
-import { EMPTY_SERVER_PROVIDERS, serverEnvironment } from "../../state/server";
-import { ProviderModelPicker } from "../chat/ProviderModelPicker";
+import { OptionalModelPicker } from "../chat/OptionalModelPicker";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
@@ -101,11 +92,11 @@ export function SnippetsPanel(props: {
                   </Button>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <SnippetModelPicker
+                  <OptionalModelPicker
                     environmentId={props.environmentId}
                     projectId={props.projectId}
-                    snippet={snippet}
-                    onChange={replace}
+                    selection={snippet.modelSelection}
+                    onChange={(modelSelection) => replace({ ...snippet, modelSelection })}
                   />
                   <Button
                     size="xs"
@@ -190,61 +181,5 @@ function SnippetForm(props: {
         </Button>
       </div>
     </form>
-  );
-}
-
-function SnippetModelPicker(props: {
-  readonly environmentId: EnvironmentId;
-  readonly projectId: ProjectId | null;
-  readonly snippet: Snippet;
-  readonly onChange: (snippet: Snippet) => void;
-}) {
-  const gt = useGT();
-  const { snippet } = props;
-  const settings = useEnvironmentSettings(props.environmentId);
-  const providers =
-    useAtomValue(serverEnvironment.providersValueAtom(props.environmentId)) ??
-    EMPTY_SERVER_PROVIDERS;
-  const entries = providerInstanceEntriesFor(providers, settings, props.projectId);
-  const selection = snippet.modelSelection;
-  const instanceId = selection?.instanceId ?? entries[0]?.instanceId;
-  if (instanceId === undefined) return null;
-  const model = selection?.model ?? "";
-  return (
-    <>
-      <ProviderModelPicker
-        environmentId={props.environmentId}
-        activeInstanceId={instanceId}
-        model={model}
-        lockedProvider={null}
-        instanceEntries={entries}
-        modelOptionsByInstance={getCustomModelOptionsByInstance(
-          settings,
-          providers,
-          instanceId,
-          model,
-        )}
-        isComposerOwned={false}
-        compact
-        {...(selection === null ? { triggerLabel: gt("Thread model") } : {})}
-        onInstanceModelChange={(nextInstanceId, nextModel) =>
-          props.onChange({
-            ...snippet,
-            modelSelection: createModelSelection(nextInstanceId, nextModel),
-          })
-        }
-      />
-      {selection !== null ? (
-        <Button
-          size="icon-xs"
-          variant="ghost"
-          aria-label={gt("Use the thread's model")}
-          title={gt("Use the thread's model")}
-          onClick={() => props.onChange({ ...snippet, modelSelection: null })}
-        >
-          <XIcon />
-        </Button>
-      ) : null}
-    </>
   );
 }

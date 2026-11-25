@@ -1,4 +1,9 @@
 {
+  "20274086885ac74f": "Upstream changes conflict with {branch}. Merge them with an agent.",
+  "1ce127daaa6f1fc1": "Merge upstream",
+  "23d0ace07cfdffba": "An agent merges upstream into {branch} in {repo}, resolves the conflicts, then rebuilds and reinstalls T3 Code.",
+  "0bfb565db528a806": "Merge upstream with an agent",
+  "15adad76fe54f295": "Start merge",
   "627355a2b09dd7a0": "Side chats are not available in this thread.",
   "925c3050bde4e210": "Snippets",
   "8d1f7d4c3acdd017": "Thread model",

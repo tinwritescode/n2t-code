@@ -42,6 +42,7 @@ import {
 } from "./DesktopUpdateStatusIcon";
 import { SidebarUpdateReleaseNotes } from "./SidebarUpdateReleaseNotes";
 import { SidebarUpdateCapsule } from "./SidebarUpdateCapsule";
+import { ForkMergeControl } from "./ForkMergeControl";
 import { UpdateEverythingDialog } from "./UpdateEverythingDialog";
 import type { UpdateEverythingRun, UpdateRunLocalState } from "./updateEverything.logic";
 import {
@@ -198,7 +199,8 @@ export async function installLocalUpdate(
 }
 
 export function SidebarUpdatePill() {
-  return <SidebarUpdateControl />;
+  const forkConflict = useDesktopUpdateState()?.forkConflict;
+  return forkConflict ? <ForkMergeControl conflict={forkConflict} /> : <SidebarUpdateControl />;
 }
 
 function SidebarUpdateControl() {

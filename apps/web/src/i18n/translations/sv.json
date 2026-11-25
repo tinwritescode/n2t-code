@@ -1,4 +1,9 @@
 {
+  "20274086885ac74f": "Ändringar från upstream krockar med {branch}. Slå ihop dem med en agent.",
+  "1ce127daaa6f1fc1": "Slå ihop upstream",
+  "23d0ace07cfdffba": "En agent slår ihop upstream i {branch} i {repo}, löser konflikterna och bygger sedan om och installerar om T3 Code.",
+  "0bfb565db528a806": "Slå ihop upstream med en agent",
+  "15adad76fe54f295": "Starta sammanslagning",
   "627355a2b09dd7a0": "Sidochattar är inte tillgängliga i den här tråden.",
   "925c3050bde4e210": "Snippets",
   "8d1f7d4c3acdd017": "Trådens modell",

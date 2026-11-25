@@ -1,4 +1,9 @@
 {
+  "20274086885ac74f": "As mudanças do upstream conflitam com {branch}. Mescle-as com um agente.",
+  "1ce127daaa6f1fc1": "Mesclar upstream",
+  "23d0ace07cfdffba": "Um agente mescla o upstream em {branch} em {repo}, resolve os conflitos e depois recompila e reinstala o T3 Code.",
+  "0bfb565db528a806": "Mesclar upstream com um agente",
+  "15adad76fe54f295": "Iniciar mesclagem",
   "627355a2b09dd7a0": "Chats paralelos não estão disponíveis nesta conversa.",
   "925c3050bde4e210": "Snippets",
   "8d1f7d4c3acdd017": "Modelo da conversa",

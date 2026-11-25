@@ -1,4 +1,9 @@
 {
+  "20274086885ac74f": "Los cambios de upstream entran en conflicto con {branch}. Fusiónalos con un agente.",
+  "1ce127daaa6f1fc1": "Fusionar upstream",
+  "23d0ace07cfdffba": "Un agente fusiona upstream en {branch} en {repo}, resuelve los conflictos y luego recompila y reinstala T3 Code.",
+  "0bfb565db528a806": "Fusionar upstream con un agente",
+  "15adad76fe54f295": "Iniciar fusión",
   "627355a2b09dd7a0": "Los chats laterales no están disponibles en este hilo.",
   "925c3050bde4e210": "Fragmentos",
   "8d1f7d4c3acdd017": "Modelo del hilo",

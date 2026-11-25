@@ -1,4 +1,9 @@
 {
+  "20274086885ac74f": "Upstream-Änderungen stehen im Konflikt mit {branch}. Lass sie von einem Agenten zusammenführen.",
+  "1ce127daaa6f1fc1": "Upstream zusammenführen",
+  "23d0ace07cfdffba": "Ein Agent führt Upstream in {branch} in {repo} zusammen, löst die Konflikte und baut T3 Code anschließend neu und installiert es erneut.",
+  "0bfb565db528a806": "Upstream mit einem Agenten zusammenführen",
+  "15adad76fe54f295": "Zusammenführen starten",
   "627355a2b09dd7a0": "Nebenchats sind in diesem Thread nicht verfügbar.",
   "925c3050bde4e210": "Snippets",
   "8d1f7d4c3acdd017": "Thread-Modell",

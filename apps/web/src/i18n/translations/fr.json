@@ -1,4 +1,9 @@
 {
+  "20274086885ac74f": "Les modifications upstream sont en conflit avec {branch}. Fusionnez-les avec un agent.",
+  "1ce127daaa6f1fc1": "Fusionner upstream",
+  "23d0ace07cfdffba": "Un agent fusionne upstream dans {branch} dans {repo}, résout les conflits, puis recompile et réinstalle T3 Code.",
+  "0bfb565db528a806": "Fusionner upstream avec un agent",
+  "15adad76fe54f295": "Lancer la fusion",
   "627355a2b09dd7a0": "Les discussions annexes ne sont pas disponibles dans ce fil.",
   "925c3050bde4e210": "Extraits",
   "8d1f7d4c3acdd017": "Modèle du fil",
