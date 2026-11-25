@@ -12988,5 +12988,13 @@
   "201490988858b511": "återkallad av {by}",
   "99451a5d2d40440f": "Återkallad av {by}.",
   "3ee30a50b70fffab": "Återkallad av {by}: {reason}",
-  "92e129bf413a1220": "återkallad"
+  "92e129bf413a1220": "återkallad",
+  "627355a2b09dd7a0": "Sidochattar är inte tillgängliga i den här tråden.",
+  "925c3050bde4e210": "Snippets",
+  "8d1f7d4c3acdd017": "Trådens modell",
+  "bad1bc1a60ae7255": "Använd trådens modell",
+  "6df754ae1f6b3e85": "Inga snippets",
+  "54ea946646720cef": "Spara en prompt en gång och kör den sedan i en sidochatt med ett klick.",
+  "4e87e902dffe3485": "Kör",
+  "9f82b0c29367e325": "Nytt snippet"
 }

@@ -28,8 +28,8 @@ export type SideChatMessage = Pick<
 /**
  * Starts side chats from `threadRef`, or offers none when it is null. `open` forks the
  * thread's latest stable point, sends `message` there with `readSettings()`, the parent
- * composer's settings, and shows the tab. It resolves false when the side chat did not
- * start, or another one is still starting.
+ * composer's settings, and shows the tab. `modelSelection` overrides the composer's model.
+ * It resolves false when the side chat did not start, or another one is still starting.
  */
 export function useSideChat(input: {
   readonly threadRef: ScopedThreadRef | null;
@@ -56,8 +56,14 @@ export function useSideChat(input: {
     const error = squashAtomCommandFailure(failure);
     input.onError(thrownErrorMessage(error, m) ?? fallback);
   };
-  const start = async (threadRef: ScopedThreadRef, message: SideChatMessage | undefined) => {
-    const { runtimeMode, modelSelection } = input.readSettings();
+  const start = async (
+    threadRef: ScopedThreadRef,
+    message: SideChatMessage | undefined,
+    modelOverride: ModelSelection | undefined,
+  ) => {
+    const settings = input.readSettings();
+    const { runtimeMode } = settings;
+    const modelSelection = modelOverride ?? settings.modelSelection;
     const targetThreadId = newThreadId();
     const fork = await forkSideChat({
       environmentId: threadRef.environmentId,
@@ -123,11 +129,11 @@ export function useSideChat(input: {
     useRightPanelStore.getState().openThread(threadRef, targetThreadId);
     return true;
   };
-  const open = async (message?: SideChatMessage) => {
+  const open = async (message?: SideChatMessage, modelSelection?: ModelSelection) => {
     const { threadRef } = input;
     if (!threadRef || pendingRef.current) return false;
     pendingRef.current = true;
-    return start(threadRef, message).finally(() => {
+    return start(threadRef, message, modelSelection).finally(() => {
       pendingRef.current = false;
     });
   };

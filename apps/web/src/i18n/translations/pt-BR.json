@@ -12981,5 +12981,13 @@
   "201490988858b511": "retirada por {by}",
   "99451a5d2d40440f": "Retirada por {by}.",
   "3ee30a50b70fffab": "Retirada por {by}: {reason}",
-  "92e129bf413a1220": "retirada"
+  "92e129bf413a1220": "retirada",
+  "627355a2b09dd7a0": "Chats paralelos não estão disponíveis nesta conversa.",
+  "925c3050bde4e210": "Snippets",
+  "8d1f7d4c3acdd017": "Modelo da conversa",
+  "bad1bc1a60ae7255": "Usar o modelo da conversa",
+  "6df754ae1f6b3e85": "Nenhum snippet",
+  "54ea946646720cef": "Salve um prompt uma vez e execute-o em um chat paralelo com um clique.",
+  "4e87e902dffe3485": "Executar",
+  "9f82b0c29367e325": "Novo snippet"
 }

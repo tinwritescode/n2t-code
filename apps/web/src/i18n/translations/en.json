@@ -12990,5 +12990,13 @@
   "201490988858b511": "withdrawn by {by}",
   "99451a5d2d40440f": "Withdrawn by {by}.",
   "3ee30a50b70fffab": "Withdrawn by {by}: {reason}",
-  "92e129bf413a1220": "withdrawn"
+  "92e129bf413a1220": "withdrawn",
+  "627355a2b09dd7a0": "Side chats are not available in this thread.",
+  "925c3050bde4e210": "Snippets",
+  "8d1f7d4c3acdd017": "Thread model",
+  "bad1bc1a60ae7255": "Use the thread's model",
+  "6df754ae1f6b3e85": "No snippets",
+  "54ea946646720cef": "Save a prompt once, then run it in a side chat with one click.",
+  "4e87e902dffe3485": "Run",
+  "9f82b0c29367e325": "New snippet"
 }

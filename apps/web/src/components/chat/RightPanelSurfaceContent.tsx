@@ -7,6 +7,7 @@ import type {
   ProjectId,
   ResolvedKeybindingsConfig,
   ScopedThreadRef,
+  Snippet,
   ThreadLinkedPullRequest,
   ThreadPullRequestLink,
 } from "@t3tools/contracts";
@@ -28,6 +29,7 @@ import { PullRequestDetailPanel } from "../pullRequest/PullRequestDetailPanel";
 import { PullRequestDetailGhost } from "../pullRequest/PullRequestGhosts";
 import { PullRequestsUnavailableState } from "../pullRequest/PullRequestsUnavailableState";
 import { ThreadPullRequestsPanel } from "../pullRequest/ThreadPullRequestsPanel";
+import { SnippetsPanel } from "../snippets/SnippetsPanel";
 
 const PreviewPanel = lazy(() =>
   import("../preview/PreviewPanel").then((module) => ({ default: module.PreviewPanel })),
@@ -85,6 +87,11 @@ export function RightPanelSurfaceContent(props: {
   readonly pullRequest: RightPanelPullRequestProps;
   readonly issuesSupported: boolean;
   readonly files: RightPanelFileProps;
+  readonly snippets: {
+    readonly projectId: ProjectId | null;
+    readonly runDisabledReason: string | null;
+    readonly onRun: (snippet: Snippet) => void;
+  };
   readonly sideChatParentPanel: SideChatParentPanel;
 }) {
   const { surface, threadRef, visible, onCloseSurface } = props;
@@ -232,6 +239,8 @@ export function RightPanelSurfaceContent(props: {
       );
     case "pull-requests":
       return <ThreadPullRequestsPanel threadRef={threadRef} />;
+    case "snippets":
+      return <SnippetsPanel environmentId={props.environmentId} {...props.snippets} />;
     case "thread":
       // Not lazy: revealing a suspended tiptap editor tears down its view and crashes the composer.
       return (

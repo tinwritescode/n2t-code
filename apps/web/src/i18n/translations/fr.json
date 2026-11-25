@@ -12981,5 +12981,13 @@
   "201490988858b511": "retirée par {by}",
   "99451a5d2d40440f": "Retirée par {by}.",
   "3ee30a50b70fffab": "Retirée par {by} : {reason}",
-  "92e129bf413a1220": "retirée"
+  "92e129bf413a1220": "retirée",
+  "627355a2b09dd7a0": "Les discussions annexes ne sont pas disponibles dans ce fil.",
+  "925c3050bde4e210": "Extraits",
+  "8d1f7d4c3acdd017": "Modèle du fil",
+  "bad1bc1a60ae7255": "Utiliser le modèle du fil",
+  "6df754ae1f6b3e85": "Aucun extrait",
+  "54ea946646720cef": "Enregistrez un prompt une fois, puis lancez-le dans une discussion annexe en un clic.",
+  "4e87e902dffe3485": "Lancer",
+  "9f82b0c29367e325": "Nouvel extrait"
 }

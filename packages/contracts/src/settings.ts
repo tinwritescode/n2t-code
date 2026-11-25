@@ -413,6 +413,25 @@ export const VoiceTranscriptionDestination = Schema.Union([
 ]);
 export type VoiceTranscriptionDestination = typeof VoiceTranscriptionDestination.Type;
 
+/** A saved prompt the snippets panel runs as a side chat. A null model follows the thread's. */
+export const Snippet = Schema.Struct({
+  id: TrimmedNonEmptyString,
+  name: TrimmedNonEmptyString,
+  prompt: TrimmedNonEmptyString,
+  modelSelection: Schema.NullOr(ModelSelection),
+});
+export type Snippet = typeof Snippet.Type;
+
+export const DEFAULT_SNIPPETS: ReadonlyArray<Snippet> = [
+  {
+    id: "linear-my-tickets",
+    name: "My Linear tickets",
+    prompt:
+      "Use Linear to list every issue assigned to me that is not Done, Canceled, or Duplicate. Group them by state, starting with In Progress, then Todo, then Backlog. For each issue show its key, title, priority, and link. End with the one issue I should work on next and why.",
+    modelSelection: null,
+  },
+];
+
 export const ClientSettingsSchema = Schema.Struct({
   notificationMode: NotificationMode.pipe(
     Schema.withDecodingDefault(Effect.succeed("off" as const)),
@@ -531,6 +550,10 @@ export const ClientSettingsSchema = Schema.Struct({
   ).pipe(Schema.withDecodingDefault(Effect.succeed({}))),
 
   pullRequestLinksOpenInApp: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(true))),
+
+  snippets: Schema.Array(Snippet).pipe(
+    Schema.withDecodingDefault(Effect.succeed(DEFAULT_SNIPPETS)),
+  ),
 
   composerRichTextEnabled: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(true))),
   sendShortcut: Schema.Literals(["enter", "mod-enter-multiline", "mod-enter"]).pipe(
@@ -2153,6 +2176,7 @@ export const ClientSettingsPatch = Schema.Struct({
     Schema.Record(TrimmedNonEmptyString, PullRequestMergeMethod),
   ),
   pullRequestLinksOpenInApp: Schema.optionalKey(Schema.Boolean),
+  snippets: Schema.optionalKey(Schema.Array(Snippet)),
   composerRichTextEnabled: Schema.optionalKey(Schema.Boolean),
   sendShortcut: Schema.optionalKey(Schema.Literals(["enter", "mod-enter-multiline", "mod-enter"])),
   followUpBehavior: Schema.optionalKey(Schema.Literals(["queue", "steer"])),
