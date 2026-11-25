@@ -299,6 +299,8 @@ export interface DesktopUpdateState {
   channelBlockedByPolicy?: true;
   /** The check failed only because this build's track differs from the saved `channel`. */
   trackMismatch?: { readonly buildChannel: DesktopUpdateChannel };
+  /** A fork build's update stopped because upstream conflicts with `branch` in the `repo` checkout. */
+  forkConflict?: { readonly repo: string; readonly branch: string };
 }
 
 export interface DesktopUpdateReleaseNote {
@@ -344,6 +346,7 @@ export const DesktopUpdateStateSchema = Schema.Struct({
   notAppliedVersion: Schema.optionalKey(Schema.String),
   channelBlockedByPolicy: Schema.optionalKey(Schema.Literal(true)),
   trackMismatch: Schema.optionalKey(Schema.Struct({ buildChannel: DesktopUpdateChannelSchema })),
+  forkConflict: Schema.optionalKey(Schema.Struct({ repo: Schema.String, branch: Schema.String })),
 });
 
 export const DesktopCliCommandStateSchema = Schema.Struct({
