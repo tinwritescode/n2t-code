@@ -1,4 +1,10 @@
-import { ArrowLeftIcon, ArrowRightIcon, ChartNoAxesColumnIcon, SettingsIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ChartNoAxesColumnIcon,
+  SettingsIcon,
+  ZapIcon,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import { T, useGT } from "gt-react";
 import { memo } from "react";
@@ -246,6 +252,10 @@ const SidebarUtilityMenu = memo(function SidebarUtilityMenu() {
       search: readPullRequestListPreferences(),
     });
   };
+  const handleSnippetsClick = () => {
+    closeMobileSidebar();
+    void navigate({ to: "/snippets" });
+  };
   const handleIssuesClick = () => {
     closeMobileSidebar();
     void navigate({ to: "/issues", search: readIssueListPreferences() });
@@ -292,6 +302,11 @@ const SidebarUtilityMenu = memo(function SidebarUtilityMenu() {
               onClick={handlePullRequestsClick}
             />
           ) : null}
+          <SidebarUtilityItem
+            icon={<ZapIcon />}
+            label={gt("Snippets")}
+            onClick={handleSnippetsClick}
+          />
           {issuesSupported ? (
             <SidebarUtilityItem
               icon={<IssueGlyph.issue />}
