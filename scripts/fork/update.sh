@@ -2,7 +2,7 @@
 # Rebuilds this fork as "T3 Code (Nightly).app" and swaps it into /Applications.
 #
 #   scripts/fork/update.sh              build the current checkout, install, relaunch
-#   scripts/fork/update.sh --sync       merge upstream/main first
+#   scripts/fork/update.sh --sync       merge the newest upstream nightly tag first
 #   scripts/fork/update.sh --no-install build only and print the .app path
 #
 # Each install keeps the replaced app and a copy of the database in ~/.t3/fork-backup.
@@ -23,9 +23,13 @@ for arg in "$@"; do
 done
 
 if $sync; then
-  git fetch upstream main
+  # Upstream has no nightly branch: each nightly is a tag cut from main. Merge the newest one.
+  tag=$(git ls-remote --tags --sort=-v:refname upstream 'refs/tags/v*-nightly.*' |
+    grep -v '\^{}' | head -1 | sed 's#.*refs/tags/##')
+  [ -n "$tag" ] || { echo "no upstream nightly tag found" >&2; exit 1; }
+  git fetch --no-tags upstream "refs/tags/$tag:refs/tags/$tag"
   # Stops on conflicts: resolve, commit, then rerun without --sync.
-  git merge --no-edit upstream/main
+  git merge --no-edit "$tag"
 fi
 
 pnpm install --frozen-lockfile --yes
@@ -61,10 +65,10 @@ perl -MPOSIX -e 'POSIX::setsid(); exec @ARGV' /bin/bash -c '
   if running; then osascript -e "quit app \"$name\""; fi
   # Waits through any quit confirmation T3 Code shows.
   while running; do sleep 1; done
-  mkdir -p "$backup"
-  cp -f "$HOME"/.t3/userdata/statev2.sqlite* "$backup"/ 2>/dev/null || true
-  rm -rf "$backup/previous.app"
-  if [ -d "$dest" ]; then mv "$dest" "$backup/previous.app"; fi
+  stamp=$(date +%Y%m%d-%H%M%S)
+  mkdir -p "$backup/db-$stamp"
+  cp -f "$HOME"/.t3/userdata/statev2.sqlite* "$backup/db-$stamp"/ 2>/dev/null || true
+  if [ -d "$dest" ]; then mv "$dest" "$backup/previous-$stamp.app"; fi
   ditto "$app" "$dest"
   open "$dest"
   echo "installed $(date)"
