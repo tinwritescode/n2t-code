@@ -1,0 +1,46 @@
+# Opens a PR from upstream pingdotgg/t3code:main into this fork's `custom` branch.
+# The PR's head is upstream's branch, so an open PR keeps tracking new upstream
+# commits by itself; this job only opens a new one after the last was merged.
+# Merge it with "Create a merge commit" (not squash or rebase) so the next sync
+# starts from the merged history.
+name: Sync upstream
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency: sync-upstream
+
+jobs:
+  sync:
+    if: github.repository != 'pingdotgg/t3code'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      BASE: custom
+      HEAD: pingdotgg:main
+    steps:
+      - name: Open sync PR if upstream has new commits
+        run: |
+          set -euo pipefail
+          open=$(gh api "repos/$REPO/pulls?state=open&base=$BASE&head=$HEAD" -q 'length')
+          if [ "$open" != "0" ]; then
+            echo "Sync PR already open; it tracks upstream automatically."
+            exit 0
+          fi
+          ahead=$(gh api "repos/$REPO/compare/$BASE...$HEAD" -q '.ahead_by')
+          if [ "$ahead" = "0" ]; then
+            echo "Up to date with upstream."
+            exit 0
+          fi
+          gh api "repos/$REPO/pulls" \
+            -f base="$BASE" -f head="$HEAD" \
+            -f title="Sync upstream pingdotgg/t3code ($ahead commits)" \
+            -f body="Automated sync from upstream \`main\`. Merge with **Create a merge commit** so the next sync starts from this history." \
+            -q '.html_url'
