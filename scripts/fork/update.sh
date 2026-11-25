@@ -2,7 +2,7 @@
 # Rebuilds this fork as "T3 Code (Nightly).app" and swaps it into /Applications.
 #
 #   scripts/fork/update.sh              build the current checkout, install, relaunch
-#   scripts/fork/update.sh --sync       merge the newest upstream nightly tag first
+#   scripts/fork/update.sh --sync       merge upstream/main first
 #   scripts/fork/update.sh --no-install build only and print the .app path
 #
 # Each install keeps the replaced app and a copy of the database in ~/.t3/fork-backup.
@@ -23,14 +23,9 @@ for arg in "$@"; do
 done
 
 if $sync; then
-  # Upstream has no nightly branch: each nightly is a tag cut from main. Merge the newest one.
-  # awk reads to the end: closing the pipe early would fail the script under pipefail.
-  tag=$(git ls-remote --tags --sort=-v:refname upstream 'refs/tags/v*-nightly.*' |
-    awk '!/\^\{\}/ && !t { sub(/.*refs\/tags\//, ""); t = $0 } END { print t }')
-  [ -n "$tag" ] || { echo "no upstream nightly tag found" >&2; exit 1; }
-  git fetch --no-tags upstream "refs/tags/$tag:refs/tags/$tag"
+  git fetch upstream main
   # Stops on conflicts: resolve, commit, then rerun without --sync.
-  git merge --no-edit "$tag"
+  git merge --no-edit upstream/main
 fi
 
 pnpm install --frozen-lockfile --yes
