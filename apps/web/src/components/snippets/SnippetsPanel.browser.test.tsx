@@ -1,9 +1,17 @@
-import { EnvironmentId, ProjectId } from "@t3tools/contracts";
+import {
+  EnvironmentId,
+  ProjectId,
+  ProviderDriverKind,
+  ProviderInstanceId,
+  type ServerProvider,
+} from "@t3tools/contracts";
 import {
   DEFAULT_CLIENT_SETTINGS,
   DEFAULT_SNIPPETS,
   type Snippet,
 } from "@t3tools/contracts/settings";
+import { createModelCapabilities } from "@t3tools/shared/model";
+import { Atom } from "effect/reactivity";
 import { describe, expect, it, vi } from "vite-plus/test";
 import { page } from "vite-plus/test/browser";
 
@@ -12,6 +20,53 @@ import { __setClientSettingsForTests, getClientSettings } from "../../hooks/useS
 import { SnippetsPanel } from "./SnippetsPanel";
 
 const environmentId = EnvironmentId.make("local");
+const codex = ProviderInstanceId.make("codex");
+
+vi.mock(import("../../state/server"), async (original) => {
+  const actual = await original();
+  const providers = Atom.make<ReadonlyArray<ServerProvider>>([
+    {
+      instanceId: ProviderInstanceId.make("codex"),
+      driver: ProviderDriverKind.make("codex"),
+      enabled: true,
+      installed: true,
+      version: null,
+      status: "ready",
+      auth: { status: "authenticated" },
+      checkedAt: "2026-11-03T00:00:00.000Z",
+      models: [
+        {
+          slug: "gpt-5.4",
+          name: "GPT-5.4",
+          isCustom: false,
+          capabilities: createModelCapabilities({
+            optionDescriptors: [
+              {
+                id: "reasoningEffort",
+                label: "Reasoning effort",
+                type: "select",
+                options: [
+                  { id: "low", label: "Low", isDefault: true },
+                  { id: "high", label: "High" },
+                ],
+                currentValue: "low",
+              },
+            ],
+          }),
+        },
+      ],
+      skills: [],
+      slashCommands: [],
+    },
+  ]);
+  return {
+    ...actual,
+    serverEnvironment: {
+      ...actual.serverEnvironment,
+      providersValueAtom: (() => providers) as never,
+    },
+  };
+});
 
 function panel(
   props: {
@@ -120,6 +175,31 @@ describe("SnippetsPanel", () => {
     expect(onRun).toHaveBeenCalledWith(
       { ...review, prompt: "Review https://github.com/o/r/pull/7" },
       null,
+    );
+  });
+
+  it("saves a snippet's thinking level with its model", async () => {
+    const review = {
+      id: "review",
+      name: "Review",
+      prompt: "Review the branch.",
+      modelSelection: {
+        instanceId: codex,
+        model: "gpt-5.4",
+        options: [{ id: "reasoningEffort", value: "high" }],
+      },
+    };
+    await using _screen = await render(panel({ snippets: [review] }));
+
+    await page.getByRole("button", { name: "High", exact: true }).click();
+    await page.getByRole("menuitemradio", { name: /^Low/ }).click();
+
+    await vi.waitFor(() =>
+      expect(getClientSettings().snippets[0]?.modelSelection).toEqual({
+        instanceId: codex,
+        model: "gpt-5.4",
+        options: expect.arrayContaining([{ id: "reasoningEffort", value: "low" }]),
+      }),
     );
   });
 });

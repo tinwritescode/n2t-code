@@ -5,13 +5,17 @@ import { useGT } from "gt-react";
 import { XIcon } from "lucide-react";
 
 import { useEnvironmentSettings } from "~/hooks/useSettings";
-import { getCustomModelOptionsByInstance } from "../../modelSelection";
+import { getCustomModelOptionsByInstance, selectsPlanAgent } from "../../modelSelection";
 import { providerInstanceEntriesFor } from "../../providerInstances";
 import { EMPTY_SERVER_PROVIDERS, serverEnvironment } from "../../state/server";
 import { Button } from "../ui/button";
 import { ProviderModelPicker } from "./ProviderModelPicker";
+import { TraitsPicker } from "./TraitsPicker";
 
-/** A model picker that can also be left on the thread's model, which `null` stands for. */
+/**
+ * A model picker, with the chosen model's traits such as thinking level, that can also be left on
+ * the thread's model, which `null` stands for.
+ */
 export function OptionalModelPicker(props: {
   readonly environmentId: EnvironmentId;
   readonly projectId: ProjectId | null;
@@ -28,6 +32,8 @@ export function OptionalModelPicker(props: {
   const instanceId = selection?.instanceId ?? entries[0]?.instanceId;
   if (instanceId === undefined) return null;
   const model = selection?.model ?? "";
+  const entry =
+    selection === null ? undefined : entries.find((each) => each.instanceId === instanceId);
   return (
     <>
       <ProviderModelPicker
@@ -49,6 +55,20 @@ export function OptionalModelPicker(props: {
           props.onChange(createModelSelection(nextInstanceId, nextModel))
         }
       />
+      {selection !== null && entry ? (
+        <TraitsPicker
+          provider={entry.driverKind}
+          instanceId={instanceId}
+          models={entry.models}
+          model={model}
+          modelOptions={selection.options ?? []}
+          allowPromptInjectedEffort={false}
+          includePlanAgent={selectsPlanAgent(selection.options)}
+          onModelOptionsChange={(options) =>
+            props.onChange(createModelSelection(instanceId, model, options))
+          }
+        />
+      ) : null}
       {selection !== null ? (
         <Button
           size="icon-xs"
