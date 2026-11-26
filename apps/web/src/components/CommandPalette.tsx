@@ -1735,6 +1735,7 @@ function OpenCommandPaletteDialog(props: {
       ],
       title: gt("Open pull requests"),
       icon: <PullRequestGlyph.pullRequest className={ITEM_ICON_CLASS} />,
+      shortcutCommand: "pullRequests.open",
       run: async () => {
         await navigate({ to: "/pull-requests", search: readPullRequestListPreferences() });
       },
@@ -1752,6 +1753,7 @@ function OpenCommandPaletteDialog(props: {
       searchTerms: ["issues", "issue", "bugs", "tracker", "github", "triage"],
       title: gt("Open issues"),
       icon: <IssueGlyph.issue className={ITEM_ICON_CLASS} />,
+      shortcutCommand: "issues.open",
       run: async () => {
         await navigate({ to: "/issues", search: readIssueListPreferences() });
       },

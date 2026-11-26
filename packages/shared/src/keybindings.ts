@@ -90,6 +90,11 @@ export const DEFAULT_KEYBINDINGS: ReadonlyArray<KeybindingRule> = [
   { key: "mod+p", command: "filePicker.toggle", when: "!terminalFocus" },
   { key: "mod+shift+f", command: "projectSearch.toggle", when: "!terminalFocus" },
   { key: "mod+u", command: "usage.open", when: "!terminalFocus" },
+  { key: "mod+,", command: "settings.open", when: "!terminalFocus" },
+  { key: "mod+alt+p", command: "pullRequests.open", when: "!terminalFocus" },
+  { key: "mod+alt+s", command: "snippets.open", when: "!terminalFocus" },
+  // `o` for the issue glyph's open circle: mod+alt+i opens the developer tools on macOS.
+  { key: "mod+alt+o", command: "issues.open", when: "!terminalFocus" },
   { key: "mod+alt+a", command: "theme.select", when: "!terminalFocus" },
   { key: "mod+alt+shift+a", command: "appearance.cycle", when: "!terminalFocus" },
   { key: "mod+alt+shift+t", command: "themeEditor.toggle" },

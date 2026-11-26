@@ -1,4 +1,3 @@
-import type { AnyRouter } from "@tanstack/react-router";
 import { msg } from "gt-react";
 
 import {
@@ -7,6 +6,8 @@ import {
   useCommandPaletteStore,
 } from "../commandPaletteStore";
 import { overlayModeForCommand } from "../components/CommandPalette.logic";
+import { readIssueListPreferences } from "../components/issue/issueListPreferences";
+import { readPullRequestListPreferences } from "../components/pullRequest/pullRequestListPreferences";
 import { APPEARANCE_OPTIONS, notifyThemeSaveFailure } from "../components/CommandPaletteThemeItems";
 import { toggleThemeEditorForTheme } from "../components/settings/themeEditorStore";
 import { toastManager } from "../components/ui/toast";
@@ -16,6 +17,7 @@ import { selectActiveRightPanel, useRightPanelStore } from "../rightPanelStore";
 import { type CommandHandler, type CommandScopeOptions, registerCommands } from "./dispatcher";
 import { selectThreadTerminalUiState, useTerminalUiStateStore } from "../terminalUiStateStore";
 import { resolveThreadRouteTarget } from "../threadRoutes";
+import type { AppRouter } from "../router";
 
 function consume(event: KeyboardEvent): void {
   event.preventDefault();
@@ -37,7 +39,7 @@ const toggleOverlay =
  * when the key is pressed, and are live only while the palette is mounted.
  */
 export function installCommandPaletteCommands(
-  router: AnyRouter,
+  router: AppRouter,
   options: Pick<CommandScopeOptions, "keybindings"> = {},
 ): () => void {
   const readRouteThreadRef = () => {
@@ -62,6 +64,15 @@ export function installCommandPaletteCommands(
       },
     },
   );
+
+  const openPage =
+    (navigate: () => Promise<void>): CommandHandler =>
+    (event) => {
+      consume(event);
+      if (event.repeat) return;
+      dispatchCommandPalette({ _tag: "SetOpen", open: false });
+      void navigate();
+    };
 
   const disposeCommands = registerCommands(
     {
@@ -97,12 +108,15 @@ export function installCommandPaletteCommands(
         const { theme, themeHalves, resolvedTheme } = getThemeSnapshot();
         toggleThemeEditorForTheme({ theme, themeHalves, initialAppearance: resolvedTheme });
       },
-      "usage.open": (event) => {
-        consume(event);
-        if (event.repeat) return;
-        dispatchCommandPalette({ _tag: "SetOpen", open: false });
-        void router.navigate({ to: "/usage" });
-      },
+      "usage.open": openPage(() => router.navigate({ to: "/usage" })),
+      "settings.open": openPage(() => router.navigate({ to: "/settings" })),
+      "pullRequests.open": openPage(() =>
+        router.navigate({ to: "/pull-requests", search: readPullRequestListPreferences() }),
+      ),
+      "snippets.open": openPage(() => router.navigate({ to: "/snippets" })),
+      "issues.open": openPage(() =>
+        router.navigate({ to: "/issues", search: readIssueListPreferences() }),
+      ),
       "commandPalette.toggle": toggleOverlay("commandPalette.toggle"),
       "filePicker.toggle": toggleOverlay("filePicker.toggle"),
       "projectSearch.toggle": toggleOverlay("projectSearch.toggle"),

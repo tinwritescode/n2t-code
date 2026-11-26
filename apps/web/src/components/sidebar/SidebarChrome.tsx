@@ -5,6 +5,7 @@ import {
   SettingsIcon,
   ZapIcon,
 } from "lucide-react";
+import type { KeybindingCommand } from "@t3tools/contracts";
 import type { ReactNode } from "react";
 import { T, useGT } from "gt-react";
 import { memo } from "react";
@@ -209,12 +210,16 @@ function SidebarBrandMark({ onBackdrop }: { onBackdrop: boolean }) {
 function SidebarUtilityItem({
   icon,
   label,
+  command,
   onClick,
 }: {
   icon: ReactNode;
   label: string;
+  command: KeybindingCommand;
   onClick: () => void;
 }) {
+  const keybindings = useAtomValue(primaryServerKeybindingsAtom);
+  const shortcutLabel = shortcutLabelForCommand(keybindings, command);
   return (
     <SidebarMenuItem className="shrink-0">
       <SharedTooltipTrigger
@@ -223,7 +228,7 @@ function SidebarUtilityItem({
             {icon}
           </SidebarMenuButton>
         }
-        label={label}
+        label={shortcutLabel ? `${label} (${shortcutLabel})` : label}
       />
     </SidebarMenuItem>
   );
@@ -292,30 +297,35 @@ const SidebarUtilityMenu = memo(function SidebarUtilityMenu() {
           <SidebarUtilityItem
             icon={<SettingsIcon />}
             label={gt("Settings")}
+            command="settings.open"
             onClick={handleSettingsClick}
           />
           {pullRequestsSupported ? (
             <SidebarUtilityItem
               icon={<PullRequestGlyph.pullRequest />}
               label={gt("Pull requests")}
+              command="pullRequests.open"
               onClick={handlePullRequestsClick}
             />
           ) : null}
           <SidebarUtilityItem
             icon={<ZapIcon />}
             label={gt("Snippets")}
+            command="snippets.open"
             onClick={handleSnippetsClick}
           />
           {issuesSupported ? (
             <SidebarUtilityItem
               icon={<IssueGlyph.issue />}
               label={gt("Issues", { $context: "sidebar link to the list of issues" })}
+              command="issues.open"
               onClick={handleIssuesClick}
             />
           ) : null}
           <SidebarUtilityItem
             icon={<ChartNoAxesColumnIcon />}
             label={gt("Usage")}
+            command="usage.open"
             onClick={handleUsageClick}
           />
         </>

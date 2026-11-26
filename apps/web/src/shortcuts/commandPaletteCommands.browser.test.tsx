@@ -16,6 +16,10 @@ const keybindings = compileResolvedKeybindingsConfig([
   { key: "mod+k", command: "commandPalette.toggle" },
   { key: "mod+alt+shift+t", command: "themeEditor.toggle" },
   { key: "mod+u", command: "usage.open" },
+  { key: "mod+,", command: "settings.open" },
+  { key: "mod+alt+p", command: "pullRequests.open" },
+  { key: "mod+alt+s", command: "snippets.open" },
+  { key: "mod+alt+o", command: "issues.open" },
 ]);
 
 function MountedPalette() {
@@ -29,6 +33,26 @@ function setup() {
 }
 
 describe("command palette shortcuts", () => {
+  it("open each sidebar page", async () => {
+    setup();
+    using _platform = vi.spyOn(navigator, "platform", "get").mockReturnValue("Linux x86_64");
+    await using screen = await render(<MountedPalette />, { router: "/" });
+    using commands = new DisposableStack();
+    commands.defer(
+      installCommandPaletteCommands(screen.router!, { keybindings: () => keybindings }),
+    );
+
+    for (const [keys, pathname] of [
+      ["{Control>},{/Control}", "/settings"],
+      ["{Control>}{Alt>}p{/Alt}{/Control}", "/pull-requests"],
+      ["{Control>}{Alt>}s{/Alt}{/Control}", "/snippets"],
+      ["{Control>}{Alt>}o{/Alt}{/Control}", "/issues"],
+    ] as const) {
+      await userEvent.keyboard(keys);
+      await vi.waitFor(() => expect(screen.router!.state.location.pathname).toBe(pathname));
+    }
+  });
+
   it("stay inert on routes without the palette", async () => {
     setup();
     using _platform = vi.spyOn(navigator, "platform", "get").mockReturnValue("Linux x86_64");
