@@ -84,7 +84,7 @@ export function parsePromptLinkRepository(value: string): PromptLinkRepository |
   return match?.[1] && match[2] ? repositoryOf(match[1], match[2]) : null;
 }
 
-function parsePromptLinkPullRequest(value: string): PromptLinkPullRequest | null {
+export function parsePromptLinkPullRequest(value: string): PromptLinkPullRequest | null {
   const trimmed = value.trim();
   const match =
     /^https?:\/\/(?:www\.)?github\.com\/([^/?#]+)\/([^/?#]+)\/pull\/(\d+)(?:[/?#].*)?$/i.exec(

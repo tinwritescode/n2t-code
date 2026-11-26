@@ -99,4 +99,27 @@ describe("SnippetsPanel", () => {
       null,
     );
   });
+
+  it("runs on a pasted pull request link without its #anchor", async () => {
+    const onRun = vi.fn();
+    const review = { id: "review", name: "Review", prompt: "Review {{pr}}", modelSelection: null };
+    await using screen = await render(panel({ onRun, snippets: [review] }));
+
+    await screen.getByRole("button", { name: "Run…" }).click();
+    await page
+      .getByRole("searchbox", { name: "Search pull requests" })
+      .fill("https://github.com/o/r/pull/7#issuecomment-1");
+    await expect
+      .element(page.getByRole("option", { name: /github\.com\/o\/r\/pull\/7/ }))
+      .toHaveAttribute("aria-selected", "true");
+    // The test page has no app styles, so the modal backdrop covers the popup for pointer clicks.
+    (
+      page.getByRole("dialog").getByRole("button", { name: "Run" }).element() as HTMLElement
+    ).click();
+
+    expect(onRun).toHaveBeenCalledWith(
+      { ...review, prompt: "Review https://github.com/o/r/pull/7" },
+      null,
+    );
+  });
 });

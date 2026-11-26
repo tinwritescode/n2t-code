@@ -2,7 +2,7 @@ import { SourceControlProviderKind } from "@t3tools/contracts";
 import { describe, expect, it } from "vite-plus/test";
 
 import type { EnvironmentPullRequestEntry } from "../pullRequest/pullRequestList.logic";
-import { snippetPullRequestChoices } from "./snippetPullRequests";
+import { snippetPullRequestChoices, snippetPullRequestLink } from "./snippetPullRequests";
 
 const pullRequest = (number: number, title: string, host = "github.com") =>
   ({
@@ -52,11 +52,37 @@ describe("snippetPullRequestChoices", () => {
     ).toEqual([login, session]);
   });
 
+  it("offers the loaded pull request a pasted link names", () => {
+    expect(
+      snippetPullRequestChoices(
+        "https://github.com/pingdotgg/t3code/pull/1#issuecomment-9",
+        [login, billing],
+        [session],
+        searchesOnHost,
+      ),
+    ).toEqual([login]);
+  });
+
   it("keeps results from a host that cannot search only when they match", () => {
     const local = pullRequest(4, "Unrelated", "git.example.com");
     const loginOnLocal = pullRequest(5, "Login form", "git.example.com");
     expect(snippetPullRequestChoices("login", [], [local, loginOnLocal], searchesOnHost)).toEqual([
       loginOnLocal,
     ]);
+  });
+});
+
+describe("snippetPullRequestLink", () => {
+  it("reads a pasted pull request link as its plain URL", () => {
+    const plain = { url: "https://github.com/o/r/pull/7", repository: "o/r" };
+    expect(snippetPullRequestLink("https://github.com/o/r/pull/7")).toEqual(plain);
+    expect(snippetPullRequestLink(" https://github.com/o/r/pull/7#issuecomment-1 ")).toEqual(plain);
+    expect(snippetPullRequestLink("https://github.com/o/r/pull/7/files#diff-abc")).toEqual(plain);
+    expect(snippetPullRequestLink("o/r#7")).toEqual(plain);
+  });
+
+  it("leaves search words alone", () => {
+    expect(snippetPullRequestLink("login")).toBeNull();
+    expect(snippetPullRequestLink("#7")).toBeNull();
   });
 });
