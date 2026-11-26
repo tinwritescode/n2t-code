@@ -46,12 +46,32 @@ It works with Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kir
 ### Snippets with live pull request search
 
 <p align="center">
-  <img src="./docs/n2t/snippets.svg" width="100%" alt="Snippets panel showing structured PR and Notes slots and the interactive pull request search run dialog" />
+  <img src="./docs/n2t/screenshot-snippets.png" width="100%" alt="Snippets page listing My Linear tickets and Council review, each with its own model and thinking level" />
+</p>
+
+<p align="center">
+  <img src="./docs/n2t/screenshot-snippet-run.png" width="100%" alt="Council review run dialog with a pasted pull request comment link resolved to the pull request, plus optional notes" />
 </p>
 
 - **Saved prompts everywhere.** Manage reusable prompts in client settings, each with its own model override (or set to follow the current thread's model). Run them as a side chat from the **Snippets** tab in the right panel, or launch a fresh thread from the **Snippets** page next to Pull requests in the sidebar.
 - **Interactive slots & PR search.** Prompts containing `{{pr}}` or `{{notes}}` display those placeholders as structured slots and open a run dialog (`Run…`) before starting. Typing in the pull request search box narrows loaded open pull requests immediately and queries the host after a 250 ms pause to reach pull requests beyond the first page. Running a PR snippet starts the thread in that pull request's project.
+- **Thinking level per snippet.** Next to a snippet's model, pick its thinking level (for example Low, Medium, or High). It is saved with the snippet and used on every run.
+- **Paste a pull request link.** Paste any GitHub pull request URL, even one pointing at a comment or a files tab, or type `owner/repo#123`, and the run dialog resolves it to that pull request.
 - **Built-in defaults.** Ships with **My Linear tickets** and **Council review** snippets out of the box, with hover/focus edit and delete controls.
+
+### Sidebar page shortcuts
+
+Open the sidebar's pages without the mouse. Each key matches the button's position, and the button tooltips show it.
+
+| Page          | macOS         | Windows / Linux  |
+| ------------- | ------------- | ---------------- |
+| Settings      | <kbd>⌃1</kbd> | <kbd>Alt+1</kbd> |
+| Pull requests | <kbd>⌃2</kbd> | <kbd>Alt+2</kbd> |
+| Snippets      | <kbd>⌃3</kbd> | <kbd>Alt+3</kbd> |
+| Issues        | <kbd>⌃4</kbd> | <kbd>Alt+4</kbd> |
+| Usage         | <kbd>⌃5</kbd> | <kbd>Alt+5</kbd> |
+
+Rebind them in **Settings → Keybindings**.
 
 ### In-app fork updater & upstream sync
 
