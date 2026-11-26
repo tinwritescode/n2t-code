@@ -15,6 +15,7 @@ import { SharedTooltipTrigger } from "../ui/shared-tooltip";
 
 export interface SidebarThreadHeaderProps {
   hasProjects: boolean;
+  viewToggle: ReactNode;
   projectScope: ReactNode;
   onNewThread: (event: ReactMouseEvent) => void;
   newThreadDisabled: boolean;
@@ -33,6 +34,7 @@ export interface SidebarThreadHeaderProps {
 
 export function SidebarThreadHeader({
   hasProjects,
+  viewToggle,
   projectScope,
   onNewThread,
   newThreadDisabled,
@@ -97,6 +99,7 @@ export function SidebarThreadHeader({
         ) : null}
       </div>
       <div className="flex shrink-0 items-center">
+        {viewToggle}
         {hasProjects ? projectScope : null}
         <SidebarHeaderIconButton
           label={gt("New thread")}

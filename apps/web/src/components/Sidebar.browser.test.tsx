@@ -134,6 +134,60 @@ describe("sidebar header new thread", () => {
   });
 });
 
+describe("sidebar recent view", () => {
+  it("lists boring sidebar threads newest first without project folders, and toggles back", async () => {
+    using stack = new DisposableStack();
+    const previousSettings = getClientSettings();
+    stack.defer(() => __setClientSettingsForTests(previousSettings));
+    stack.defer(() => localStorage.removeItem("t3code:sidebar:recent-view"));
+    __setClientSettingsForTests({ ...DEFAULT_CLIENT_SETTINGS, boringSidebarEnabled: true });
+    const alpha = project("alpha");
+    const beta = project("beta");
+    const thread = (projectId: ProjectId, title: string, createdAt: string) =>
+      makeThreadFixture({
+        environmentId: EnvironmentId.make("local"),
+        id: ThreadId.make(title),
+        projectId,
+        title,
+        createdAt,
+      });
+    vi.mocked(useProjects).mockReturnValue([alpha, beta]);
+    vi.mocked(useQuietThreadShells).mockReturnValue([
+      thread(alpha.id, "Oldest alpha", "2026-01-01T00:00:00.000Z"),
+      thread(beta.id, "Newest beta", "2026-01-03T00:00:00.000Z"),
+      thread(alpha.id, "Middle alpha", "2026-01-02T00:00:00.000Z"),
+    ]);
+    vi.mocked(useThreadRouteTarget).mockReturnValue(null);
+    vi.mocked(useHandleNewThread).mockReturnValue({
+      activeDraftThread: null,
+      activeThread: null,
+      defaultProjectRef: null,
+      defaultProjectFallbackReady: true,
+      handleNewThread: vi.fn(),
+      routeDraftId: null,
+      routeThreadRef: null,
+    });
+    await using screen = await render(
+      <SidebarProvider>
+        <Sidebar routeReveal={{ observedKey: null, pendingKey: null }} />
+      </SidebarProvider>,
+    );
+    const folderButton = screen.getByRole("button", { name: "New thread in alpha" });
+    await expect.element(folderButton).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "Show recent threads" }));
+
+    await expect.element(folderButton).not.toBeInTheDocument();
+    const text = document.body.textContent ?? "";
+    expect(text.indexOf("Newest beta")).toBeLessThan(text.indexOf("Middle alpha"));
+    expect(text.indexOf("Middle alpha")).toBeLessThan(text.indexOf("Oldest alpha"));
+
+    await userEvent.click(screen.getByRole("button", { name: "Group by project" }));
+
+    await expect.element(folderButton).toBeInTheDocument();
+  });
+});
+
 // regression: #41549 a grouped project's folder New thread went to the primary copy
 describe("sidebar project folder new thread", () => {
   it("starts in the copy of the viewed thread, as the new-thread shortcut does", async () => {
