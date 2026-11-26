@@ -3,6 +3,7 @@ import { describe, expect, it } from "vite-plus/test";
 import {
   compactDynamicToolOutput,
   compactT3McpToolOutput,
+  latestNextSteps,
   MAX_TOOL_OUTPUT_IMAGES,
   mcpToolResultOutput,
   SEND_TO_USER_MAX_LENGTH,
@@ -273,5 +274,44 @@ describe("toolOutputImages", () => {
   it("stops after the first few images", () => {
     const images = toolOutputImages(Array.from({ length: 10_000 }, () => mcpImage));
     expect(images).toHaveLength(MAX_TOOL_OUTPUT_IMAGES);
+  });
+});
+
+describe("latestNextSteps", () => {
+  const steps = [
+    { label: "Commit & deploy", prompt: "Commit the fix and deploy it." },
+    { label: "Check mood-browser", prompt: "Check mood-browser.tsx for the same bug." },
+  ];
+  const suggestion = (output: unknown, status = "completed") => ({
+    type: "dynamic_tool",
+    status,
+    toolName: "t3-code.suggest_next_steps",
+    output,
+  });
+  const result = JSON.stringify({ nextSteps: steps, message: "Shown to the user as buttons." });
+
+  it("offers the steps the latest turn suggested, even after its final reply", () => {
+    const items = [
+      { type: "user_message" },
+      suggestion([{ type: "text", text: result }]),
+      { type: "assistant_message" },
+    ];
+    expect(latestNextSteps(items)).toEqual(steps);
+  });
+
+  it("offers nothing once the user sends another message", () => {
+    expect(latestNextSteps([suggestion(result), { type: "user_message" }])).toEqual([]);
+  });
+
+  it("ignores failed, unfinished, and malformed suggestions", () => {
+    expect(latestNextSteps([suggestion({ isError: true, nextSteps: steps })])).toEqual([]);
+    expect(latestNextSteps([suggestion(result, "inProgress")])).toEqual([]);
+    expect(latestNextSteps([suggestion({ nextSteps: [{ label: "", prompt: "Go" }] })])).toEqual([]);
+    expect(latestNextSteps([suggestion({ nextSteps: [] })])).toEqual([]);
+  });
+
+  it("reads only the suggest_next_steps tool", () => {
+    const item = { ...suggestion(result), toolName: "other.suggest_next_steps" };
+    expect(latestNextSteps([item])).toEqual([]);
   });
 });

@@ -10,6 +10,12 @@ const handlers = {
       message: "Shown to the user. Don't repeat it.",
     }),
   ),
+  suggest_next_steps: McpToolAccess.actsAsCaller((input) =>
+    Effect.succeed({
+      nextSteps: input.steps,
+      message: "Shown to the user as buttons under your reply.",
+    }),
+  ),
 } satisfies McpToolAccess.Handlers<typeof MessageToolkit.tools>;
 
 export const layer = McpToolAccess.toLayer(MessageToolkit, handlers);

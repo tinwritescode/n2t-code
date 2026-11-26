@@ -461,6 +461,45 @@ it.effect("captures send_to_user results for providers that drop MCP outputs", (
   ),
 );
 
+it.effect("keeps suggested next steps on the tool item for the client's buttons", () =>
+  Effect.gen(function* () {
+    const server = yield* McpServer.McpServer;
+    const mcpSessions = yield* McpProviderSessions.McpProviderSessions;
+    const call = (steps: ReadonlyArray<{ label: string; prompt: string }>) =>
+      server
+        .callTool({ name: "suggest_next_steps", arguments: { steps } })
+        .pipe(
+          Effect.provideService(McpInvocationContext.McpInvocationContext, scope),
+          Effect.provideService(McpSchema.McpServerClient, client),
+        );
+    const steps = [
+      { label: "Commit & deploy", prompt: "Commit the fix and deploy it." },
+      { label: "Check mood-browser", prompt: "Check mood-browser.tsx for the same bug." },
+    ];
+    const result = yield* call(steps);
+    expect(result.isError).not.toBe(true);
+    expect(yield* mcpSessions.takeToolResult(threadId, "suggest_next_steps", { steps })).toEqual({
+      nextSteps: steps,
+    });
+
+    const tooMany = Array.from({ length: 5 }, (_, index) => ({
+      label: `Step ${index}`,
+      prompt: "Go",
+    }));
+    for (const invalid of [[], tooMany, [{ label: "", prompt: "Go" }]]) {
+      expect(yield* Effect.flip(call(invalid))).toMatchObject({ _tag: "InvalidParams" });
+    }
+  }).pipe(
+    Effect.provide(
+      McpHttpServer.layerMessageToolkit.pipe(
+        Layer.provideMerge(McpHttpServer.layerInProcessMcpServer),
+        Layer.provideMerge(McpProviderSessions.layer),
+        Layer.provide(McpToolAccessTestkit.liveThreadsLayer),
+      ),
+    ),
+  ),
+);
+
 it.effect("records only failed calls of tools that hand off no work", () => {
   // Recording runs detached from the tool response, so the first event is awaited.
   const recorded = Deferred.makeUnsafe<{ event: string; properties: object }>();

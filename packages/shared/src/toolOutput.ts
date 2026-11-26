@@ -20,6 +20,17 @@ import { resolveT3McpToolId } from "./t3McpToolPresentation.ts";
 export const SEND_TO_USER_TOOL_NAME = "send_to_user";
 // 4,000 UTF-16 units stay inside MAX_PARSED_BYTES even as 3-byte characters.
 export const SEND_TO_USER_MAX_LENGTH = 4_000;
+export const SUGGEST_NEXT_STEPS_TOOL_NAME = "suggest_next_steps";
+export const MAX_NEXT_STEPS = 4;
+export const NEXT_STEP_LABEL_MAX_LENGTH = 40;
+// Four steps in 3-byte characters stay inside MAX_METADATA_BYTES.
+export const NEXT_STEP_PROMPT_MAX_LENGTH = 500;
+
+/** A reply the agent offered as a button: `label` on the button, `prompt` sent when clicked. */
+export interface NextStep {
+  readonly label: string;
+  readonly prompt: string;
+}
 
 const MAX_PARSED_BYTES = 16_384;
 const MAX_METADATA_BYTES = 8_192;
@@ -62,6 +73,7 @@ interface CompactToolOutput {
   guides?: Array<{ outcome: "started" | "running" | "failed" }>;
   checks?: Array<{ rerun: boolean }>;
   sentMessage?: string;
+  nextSteps?: NextStep[];
 }
 
 function readResult(value: unknown, budget: ResultReadBudget, depth = 0): ResultEnvelope {
@@ -147,6 +159,17 @@ function readEntries<T>(
   return entries;
 }
 
+const isBoundedText = (value: unknown, maxLength: number): value is string =>
+  typeof value === "string" && value.trim() !== "" && value.length <= maxLength;
+
+function readNextStep(entry: { readonly [key: string]: unknown }): NextStep | undefined {
+  const { label, prompt } = entry;
+  return isBoundedText(label, NEXT_STEP_LABEL_MAX_LENGTH) &&
+    isBoundedText(prompt, NEXT_STEP_PROMPT_MAX_LENGTH)
+    ? { label, prompt }
+    : undefined;
+}
+
 export function compactDynamicToolOutput(value: unknown): CompactToolOutput | undefined {
   const budget: ResultReadBudget = {
     remainingBytes: MAX_PARSED_BYTES,
@@ -186,6 +209,10 @@ export function compactDynamicToolOutput(value: unknown): CompactToolOutput | un
       data.sentMessage.length <= SEND_TO_USER_MAX_LENGTH
     ) {
       output.sentMessage = data.sentMessage;
+    }
+    const nextSteps = readEntries(data.nextSteps, readNextStep);
+    if (nextSteps !== undefined && nextSteps.length > 0 && nextSteps.length <= MAX_NEXT_STEPS) {
+      output.nextSteps = nextSteps;
     }
     const htmlRender = readHtmlRenderReference(data.htmlRender);
     if (htmlRender !== undefined) output.htmlRender = htmlRender;
@@ -272,6 +299,34 @@ export function sentMessageFromToolItem(item: {
   }
   const output = compactDynamicToolOutput(item.output);
   return output?.isError ? undefined : output?.sentMessage;
+}
+
+/**
+ * The buttons `suggest_next_steps` left in the latest turn, newest call first.
+ * A later user message means the user already moved on, so it offers none.
+ */
+export function latestNextSteps(
+  items: ReadonlyArray<{
+    readonly type: string;
+    readonly status?: string;
+    readonly toolName?: string | null;
+    readonly output?: unknown;
+  }>,
+): ReadonlyArray<NextStep> {
+  for (let index = items.length - 1; index >= 0; index--) {
+    const item = items[index]!;
+    if (item.type === "user_message") return [];
+    if (
+      item.type !== "dynamic_tool" ||
+      item.status !== "completed" ||
+      resolveT3McpToolId(item.toolName) !== SUGGEST_NEXT_STEPS_TOOL_NAME
+    ) {
+      continue;
+    }
+    const output = compactDynamicToolOutput(item.output);
+    if (!output?.isError && output?.nextSteps !== undefined) return output.nextSteps;
+  }
+  return [];
 }
 
 /** The thread-owned file `preview_recording_stop` stored for the agent. */

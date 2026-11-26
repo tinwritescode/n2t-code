@@ -881,6 +881,12 @@ export function summarizeT3ToolCalls(
           );
       break;
     }
+    case "suggest-next-steps": {
+      label = done
+        ? resolve(msg("Suggested next steps"))
+        : resolve(msg("Tried to suggest next steps"));
+      break;
+    }
     case "thread-list": {
       const count = selected.length;
       label = done
