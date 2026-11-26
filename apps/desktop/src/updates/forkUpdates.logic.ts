@@ -24,6 +24,14 @@ export function parseForkConfig(text: string): ForkConfig | null {
   }
 }
 
+// scripts/fork/update.sh prints "==> [45%] Building T3 Code" as it starts each step.
+const PROGRESS_LINE = /^==> \[(\d{1,3})%\]/;
+
+export function parseForkProgress(line: string): number | null {
+  const match = PROGRESS_LINE.exec(line);
+  return match ? Math.min(100, Number(match[1])) : null;
+}
+
 const describeCommits = (count: number) => `${count} upstream commit${count === 1 ? "" : "s"}`;
 
 export function initialForkState(

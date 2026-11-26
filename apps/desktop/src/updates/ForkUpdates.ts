@@ -20,6 +20,7 @@ import {
   forkStateAfterDownload,
   initialForkState,
   parseForkConfig,
+  parseForkProgress,
 } from "./forkUpdates.logic.ts";
 
 type Updates = DesktopUpdates["Service"];
@@ -51,7 +52,11 @@ const makeForkUpdates = Effect.fn("desktop.forkUpdates.make")(function* (
 
   // A login shell gives the update script the user's PATH (node, pnpm), which an app opened
   // from Finder does not inherit. Arguments pass through "$@", so nothing is re-parsed.
-  const run = (args: ReadonlyArray<string>) =>
+  // `onLine` sees each stdout line as it arrives, for progress.
+  const run = (
+    args: ReadonlyArray<string>,
+    onLine: (line: string) => Effect.Effect<void> = () => Effect.void,
+  ) =>
     Effect.scoped(
       Effect.gen(function* () {
         const child = yield* spawner.spawn(
@@ -64,7 +69,14 @@ const makeForkUpdates = Effect.fn("desktop.forkUpdates.make")(function* (
         );
         const [stdout, stderr, code] = yield* Effect.all(
           [
-            Stream.mkString(Stream.decodeText(child.stdout)),
+            Stream.decodeText(child.stdout).pipe(
+              Stream.splitLines,
+              Stream.tap(onLine),
+              Stream.runFold(
+                () => "",
+                (text, line) => `${text}${line}\n`,
+              ),
+            ),
             Stream.mkString(Stream.decodeText(child.stderr)),
             child.exitCode,
           ],
@@ -143,7 +155,14 @@ const makeForkUpdates = Effect.fn("desktop.forkUpdates.make")(function* (
         const branch = (yield* run(["git", "branch", "--show-current"])).stdout.trim();
         const result =
           branch === config.branch
-            ? yield* run(["bash", "scripts/fork/update.sh", "--sync", "--no-install"])
+            ? yield* run(["bash", "scripts/fork/update.sh", "--sync", "--no-install"], (line) => {
+                const percent = parseForkProgress(line);
+                return percent === null
+                  ? Effect.void
+                  : Ref.get(stateRef).pipe(
+                      Effect.flatMap((state) => setState({ ...state, downloadPercent: percent })),
+                    );
+              })
             : {
                 code: 1,
                 output: `${config.repo} is on ${branch || "a detached HEAD"}, not ${config.branch}.\n`,

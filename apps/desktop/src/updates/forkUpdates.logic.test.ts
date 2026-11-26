@@ -6,6 +6,7 @@ import {
   forkStateAfterDownload,
   initialForkState,
   parseForkConfig,
+  parseForkProgress,
 } from "./forkUpdates.logic.ts";
 
 const runtimeInfo = {
@@ -25,6 +26,14 @@ describe("parseForkConfig", () => {
   it("ignores a missing branch or unreadable file", () => {
     expect(parseForkConfig('{"repo":"/code/t3code"}')).toBeNull();
     expect(parseForkConfig("not json")).toBeNull();
+  });
+});
+
+describe("parseForkProgress", () => {
+  it("reads the percent the update script prints at each step", () => {
+    expect(parseForkProgress("==> [45%] Building T3 Code")).toBe(45);
+    expect(parseForkProgress("Merge made by the 'ort' strategy.")).toBeNull();
+    expect(parseForkProgress("  ==> [45%] indented")).toBeNull();
   });
 });
 

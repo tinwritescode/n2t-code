@@ -31,6 +31,9 @@ done
 
 branch=$(git branch --show-current)
 
+# The app reads these lines to show update progress.
+progress() { echo "==> [$1%] $2"; }
+
 # Merges a ref, or aborts and exits 3 when it conflicts.
 merge() {
   if ! git merge --no-edit "$1"; then
@@ -45,13 +48,16 @@ merge() {
 
 if $sync; then
   # The fork's commits pushed from elsewhere first, then upstream's. No access to origin skips it.
+  progress 5 "Merging origin/$branch"
   if git fetch origin "$branch"; then merge "origin/$branch"; fi
+  progress 15 "Merging upstream/main"
   git fetch upstream main
   merge upstream/main
 fi
 
 out="$repo/release/fork"
 if $build; then
+  progress 25 "Installing dependencies"
   pnpm install --frozen-lockfile --yes
 
   # A -nightly.<date>.<n> version names the app "T3 Code (Nightly)", so it replaces the official
@@ -60,6 +66,7 @@ if $build; then
   version="$base-nightly.$(date +%Y%m%d).$(git rev-list --count HEAD)"
   arch=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo x64)
   rm -rf "$out"
+  progress 45 "Building T3 Code"
   # `dir` skips the DMG and zip, the slowest packaging steps.
   node scripts/build-desktop-artifact.ts --platform mac --target dir --arch "$arch" \
     --build-version "$version" --output-dir "$out"
@@ -74,6 +81,7 @@ fi
 echo "Built: $app"
 
 if $sync && $build; then
+  progress 95 "Pushing $branch to origin"
   git push origin "HEAD:$branch" || echo "could not push $branch to origin; push it by hand" >&2
 fi
 $install || exit 0
