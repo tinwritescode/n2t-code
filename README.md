@@ -59,6 +59,16 @@ It works with Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kir
 - **Paste a pull request link.** Paste any GitHub pull request URL, even one pointing at a comment or a files tab, or type `owner/repo#123`, and the run dialog resolves it to that pull request.
 - **Built-in defaults.** Ships with **My Linear tickets** and **Council review** snippets out of the box, with hover/focus edit and delete controls.
 
+### Next-step buttons
+
+<p align="center">
+  <img src="./docs/n2t/screenshot-next-steps.png" width="100%" alt="Three suggested next-step buttons above the composer after an agent turn: Commit & push, Use clamp in the slider, and Add edge-case tests" />
+</p>
+
+- **Pick the next step with one click.** When a turn ends with a few clear ways forward, the agent offers them as buttons above the composer. Clicking one sends its prompt to the thread.
+- **Works with every agent.** Agents get a `suggest_next_steps` tool through the built-in T3 MCP server, with up to four steps, each a short label and the prompt it sends.
+- **Only for the latest turn.** The buttons hide while a turn runs and disappear once you send another message.
+
 ### Sidebar page shortcuts
 
 Open the sidebar's pages without the mouse. Each key matches the button's position, and the button tooltips show it.
