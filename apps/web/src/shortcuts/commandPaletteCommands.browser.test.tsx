@@ -1,4 +1,7 @@
-import { compileResolvedKeybindingsConfig } from "@t3tools/shared/keybindings";
+import {
+  compileResolvedKeybindingsConfig,
+  DEFAULT_RESOLVED_KEYBINDINGS,
+} from "@t3tools/shared/keybindings";
 import { describe, expect, it, vi } from "vite-plus/test";
 import { page, userEvent } from "vite-plus/test/browser";
 
@@ -16,10 +19,6 @@ const keybindings = compileResolvedKeybindingsConfig([
   { key: "mod+k", command: "commandPalette.toggle" },
   { key: "mod+alt+shift+t", command: "themeEditor.toggle" },
   { key: "mod+u", command: "usage.open" },
-  { key: "mod+,", command: "settings.open" },
-  { key: "mod+alt+p", command: "pullRequests.open" },
-  { key: "mod+alt+s", command: "snippets.open" },
-  { key: "mod+alt+o", command: "issues.open" },
 ]);
 
 function MountedPalette() {
@@ -33,22 +32,25 @@ function setup() {
 }
 
 describe("command palette shortcuts", () => {
-  it("open each sidebar page", async () => {
+  it("open the sidebar pages with ctrl and their position on macOS", async () => {
     setup();
-    using _platform = vi.spyOn(navigator, "platform", "get").mockReturnValue("Linux x86_64");
+    using _platform = vi.spyOn(navigator, "platform", "get").mockReturnValue("MacIntel");
     await using screen = await render(<MountedPalette />, { router: "/" });
     using commands = new DisposableStack();
     commands.defer(
-      installCommandPaletteCommands(screen.router!, { keybindings: () => keybindings }),
+      installCommandPaletteCommands(screen.router!, {
+        keybindings: () => DEFAULT_RESOLVED_KEYBINDINGS,
+      }),
     );
 
-    for (const [keys, pathname] of [
-      ["{Control>},{/Control}", "/settings"],
-      ["{Control>}{Alt>}p{/Alt}{/Control}", "/pull-requests"],
-      ["{Control>}{Alt>}s{/Alt}{/Control}", "/snippets"],
-      ["{Control>}{Alt>}o{/Alt}{/Control}", "/issues"],
+    for (const [key, pathname] of [
+      ["1", "/settings"],
+      ["2", "/pull-requests"],
+      ["3", "/snippets"],
+      ["4", "/issues"],
+      ["5", "/usage"],
     ] as const) {
-      await userEvent.keyboard(keys);
+      await userEvent.keyboard(`{Control>}${key}{/Control}`);
       await vi.waitFor(() => expect(screen.router!.state.location.pathname).toBe(pathname));
     }
   });

@@ -55,6 +55,14 @@ type WhenToken =
   | { type: "lparen" }
   | { type: "rparen" };
 
+const SIDEBAR_PAGE_KEYBINDING_COMMANDS = [
+  "settings.open",
+  "pullRequests.open",
+  "snippets.open",
+  "issues.open",
+  "usage.open",
+] as const;
+
 export const DEFAULT_KEYBINDINGS: ReadonlyArray<KeybindingRule> = [
   { key: "mod+b", command: "sidebar.toggle" },
   { key: "f6", command: "workspace.focusNext" },
@@ -91,10 +99,12 @@ export const DEFAULT_KEYBINDINGS: ReadonlyArray<KeybindingRule> = [
   { key: "mod+shift+f", command: "projectSearch.toggle", when: "!terminalFocus" },
   { key: "mod+u", command: "usage.open", when: "!terminalFocus" },
   { key: "mod+,", command: "settings.open", when: "!terminalFocus" },
-  { key: "mod+alt+p", command: "pullRequests.open", when: "!terminalFocus" },
-  { key: "mod+alt+s", command: "snippets.open", when: "!terminalFocus" },
-  // `o` for the issue glyph's open circle: mod+alt+i opens the developer tools on macOS.
-  { key: "mod+alt+o", command: "issues.open", when: "!terminalFocus" },
+  // The sidebar's page buttons by position. mod+1…9 jump to threads, so macOS takes ctrl (which
+  // is mod elsewhere) and other platforms take alt. Listed last so tooltips show these keys.
+  ...SIDEBAR_PAGE_KEYBINDING_COMMANDS.flatMap((command, index) => [
+    { key: `ctrl+${index + 1}`, command, when: "!terminalFocus && isMac" },
+    { key: `alt+${index + 1}`, command, when: "!terminalFocus && !isMac" },
+  ]),
   { key: "mod+alt+a", command: "theme.select", when: "!terminalFocus" },
   { key: "mod+alt+shift+a", command: "appearance.cycle", when: "!terminalFocus" },
   { key: "mod+alt+shift+t", command: "themeEditor.toggle" },
