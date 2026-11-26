@@ -99,7 +99,7 @@ export function SidebarThreadHeader({
         ) : null}
       </div>
       <div className="flex shrink-0 items-center">
-        {viewToggle}
+        {hasProjects ? viewToggle : null}
         {hasProjects ? projectScope : null}
         <SidebarHeaderIconButton
           label={gt("New thread")}
@@ -142,7 +142,7 @@ export function SidebarHeaderIconButton({
   children?: ReactNode;
 } & Omit<
   ComponentProps<typeof SidebarMenuButton>,
-  "children" | "className" | "tooltip" | "isActive" | "aria-label"
+  "children" | "className" | "tooltip" | "aria-label"
 >) {
   return (
     <SharedTooltipTrigger

@@ -135,7 +135,7 @@ describe("sidebar header new thread", () => {
 });
 
 describe("sidebar recent view", () => {
-  it("lists boring sidebar threads newest first without project folders, and toggles back", async () => {
+  it("lists boring sidebar threads by latest send without project folders, and toggles back", async () => {
     using stack = new DisposableStack();
     const previousSettings = getClientSettings();
     stack.defer(() => __setClientSettingsForTests(previousSettings));
@@ -143,19 +143,22 @@ describe("sidebar recent view", () => {
     __setClientSettingsForTests({ ...DEFAULT_CLIENT_SETTINGS, boringSidebarEnabled: true });
     const alpha = project("alpha");
     const beta = project("beta");
-    const thread = (projectId: ProjectId, title: string, createdAt: string) =>
-      makeThreadFixture({
+    const thread = (projectId: ProjectId, title: string, createdAt: string, sentAt?: string) => ({
+      ...makeThreadFixture({
         environmentId: EnvironmentId.make("local"),
         id: ThreadId.make(title),
         projectId,
         title,
         createdAt,
-      });
+      }),
+      latestUserAuthoredMessageAt: sentAt ?? null,
+    });
     vi.mocked(useProjects).mockReturnValue([alpha, beta]);
+    // Creation order alone would put "Sent alpha" last.
     vi.mocked(useQuietThreadShells).mockReturnValue([
-      thread(alpha.id, "Oldest alpha", "2026-01-01T00:00:00.000Z"),
-      thread(beta.id, "Newest beta", "2026-01-03T00:00:00.000Z"),
-      thread(alpha.id, "Middle alpha", "2026-01-02T00:00:00.000Z"),
+      thread(alpha.id, "Old alpha", "2026-01-02T00:00:00.000Z"),
+      thread(beta.id, "New beta", "2026-01-03T00:00:00.000Z"),
+      thread(alpha.id, "Sent alpha", "2026-01-01T00:00:00.000Z", "2026-01-05T00:00:00.000Z"),
     ]);
     vi.mocked(useThreadRouteTarget).mockReturnValue(null);
     vi.mocked(useHandleNewThread).mockReturnValue({
@@ -173,18 +176,24 @@ describe("sidebar recent view", () => {
       </SidebarProvider>,
     );
     const folderButton = screen.getByRole("button", { name: "New thread in alpha" });
+    const toggle = screen.getByRole("button", { name: "Recent threads" });
     await expect.element(folderButton).toBeInTheDocument();
+    await expect.element(toggle).toHaveAttribute("aria-pressed", "false");
 
-    await userEvent.click(screen.getByRole("button", { name: "Show recent threads" }));
+    await userEvent.click(toggle);
 
     await expect.element(folderButton).not.toBeInTheDocument();
-    const text = document.body.textContent ?? "";
-    expect(text.indexOf("Newest beta")).toBeLessThan(text.indexOf("Middle alpha"));
-    expect(text.indexOf("Middle alpha")).toBeLessThan(text.indexOf("Oldest alpha"));
+    await expect.element(toggle).toHaveAttribute("aria-pressed", "true");
+    const rowTitles = () =>
+      Array.from(document.querySelectorAll("[data-thread-item]"), (row) =>
+        ["Sent alpha", "New beta", "Old alpha"].find((title) => row.textContent?.includes(title)),
+      );
+    expect(rowTitles()).toEqual(["Sent alpha", "New beta", "Old alpha"]);
 
-    await userEvent.click(screen.getByRole("button", { name: "Group by project" }));
+    await userEvent.click(toggle);
 
     await expect.element(folderButton).toBeInTheDocument();
+    await expect.element(toggle).toHaveAttribute("aria-pressed", "false");
   });
 });
 

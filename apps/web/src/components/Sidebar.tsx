@@ -442,7 +442,7 @@ function useSidebarThreads(input: {
   readonly routeRowThreadKey: string | null;
   readonly departingThreadKey: string | null;
   readonly boring: boolean;
-  // Set in boring mode unless the recent view is on: the project groups to fold active threads into, in order.
+  // The project groups to fold active threads into, in order; null for a flat list.
   readonly folderGroups: readonly SidebarProjectSnapshot[] | null;
   // Keeps folders with no active threads, so a project the user filtered to or pinned can start one.
   readonly keepEmptyFolders: (group: SidebarProjectSnapshot) => boolean;
@@ -462,7 +462,7 @@ function useSidebarThreads(input: {
     keepEmptyFolders: keepEmpty,
   } = input;
   const shelfRouteThreadKey = routeRowThreadKey === departingThreadKey ? null : routeRowThreadKey;
-  // Folders already separate the work, so boring mode has no Working shelf.
+  // Boring mode sorts active threads by send, so it has no Working shelf.
   const workingShelfEnabled = useClientSettings((s) => s.sidebarWorkingShelfEnabled) && !boring;
   const inboxReturnsVersion = useSyncExternalStore(
     inboxReturns.subscribe,
@@ -2073,9 +2073,13 @@ export default function Sidebar({ routeReveal }: { routeReveal: SidebarRouteReve
     dragState === null && sidebarListItems.length + visibleDraftSessionCount > 0;
   // Cache on both fields so layout-key changes trigger the effect even when animate is unchanged.
   const listMotionPass = { layoutKey: listMotionLayoutKey, animate: listMotionAnimate };
-  const shelfExpansionKey = [workingShelfExpanded, snoozedShelfExpanded, settledShelfExpanded].join(
-    ":",
-  );
+  // Switching to or from the recent view swaps every row too.
+  const shelfExpansionKey = [
+    workingShelfExpanded,
+    snoozedShelfExpanded,
+    settledShelfExpanded,
+    recentView,
+  ].join(":");
   const previousShelfExpansionKeyRef = useRef(shelfExpansionKey);
   // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- records moved rows and updates list motion after each layout-affecting commit
   useLayoutEffect(() => {
@@ -3101,10 +3105,14 @@ export default function Sidebar({ routeReveal }: { routeReveal: SidebarRouteReve
               viewToggle={
                 boringSidebarEnabled ? (
                   <SidebarHeaderIconButton
-                    label={recentView ? gt("Group by project") : gt("Show recent threads")}
+                    label={gt("Recent threads")}
                     aria-pressed={recentView}
-                    data-active={recentView}
-                    onClick={() => setRecentView((value) => !value)}
+                    isActive={recentView}
+                    onClick={() => {
+                      clearSelection();
+                      setRecentView((value) => !value);
+                      scrollSidebarToTop(sidebarContentRef.current);
+                    }}
                   >
                     <HistoryIcon />
                   </SidebarHeaderIconButton>
