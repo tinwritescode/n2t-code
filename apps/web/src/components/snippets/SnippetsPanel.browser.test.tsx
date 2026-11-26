@@ -87,7 +87,7 @@ describe("SnippetsPanel", () => {
     };
     await using screen = await render(panel({ onRun, snippets: [standup] }));
 
-    await screen.getByRole("button", { name: "Run" }).click();
+    await screen.getByRole("button", { name: "Run…" }).click();
     await page.getByRole("textbox", { name: "Notes" }).fill("Skip the release work.");
     // The test page has no app styles, so the modal backdrop covers the popup for pointer clicks.
     (

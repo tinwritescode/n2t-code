@@ -37,7 +37,7 @@ export function SnippetsPage() {
       <WorkspacePageHeader electron={isElectron} className="bg-background">
         <h1 className="truncate text-sm font-medium">{gt("Snippets")}</h1>
       </WorkspacePageHeader>
-      <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col pb-4">
+      <div className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col pt-2 pb-4">
         {pickerEnvironmentId === null ? null : (
           <SnippetsPanel
             environmentId={pickerEnvironmentId}

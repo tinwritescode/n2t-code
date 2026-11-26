@@ -1,18 +1,23 @@
 import type { EnvironmentId, ProjectId, ScopedProjectRef, Snippet } from "@t3tools/contracts";
 import { T, useGT } from "gt-react";
-import { PencilIcon, PlayIcon, PlusIcon, Trash2Icon, Zap } from "lucide-react";
+import { PencilIcon, PlayIcon, PlusIcon, Trash2Icon, ZapIcon } from "lucide-react";
 import { useState } from "react";
 
 import { updateClientSettings, useClientSettings } from "~/hooks/useSettings";
 import { randomUUID } from "~/lib/utils";
 import { OptionalModelPicker } from "../chat/OptionalModelPicker";
+import { PullRequestGlyph } from "../pullRequest/pullRequestIcons";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
+import { SnippetPromptPreview } from "./SnippetPromptPreview";
 import { SnippetRunDialog } from "./SnippetRunDialog";
 import { snippetInputs } from "./snippetPrompt";
 
 type Draft = { readonly id: string | null; readonly name: string; readonly prompt: string };
+
+const PullRequestIcon = PullRequestGlyph.pullRequest;
+const NEW_DRAFT: Draft = { id: null, name: "", prompt: "" };
 
 const saveSnippets = (snippets: ReadonlyArray<Snippet>) => void updateClientSettings({ snippets });
 
@@ -45,104 +50,105 @@ export function SnippetsPanel(props: {
     else saveSnippets([...snippets, { id: randomUUID(), name, prompt, modelSelection: null }]);
     setDraft(null);
   };
+  const form = (value: Draft) => (
+    <SnippetForm draft={value} onChange={setDraft} onSave={save} onCancel={() => setDraft(null)} />
+  );
+  const newSnippet = (
+    <Button
+      size="xs"
+      variant="outline"
+      disabled={draft !== null}
+      onClick={() => setDraft(NEW_DRAFT)}
+    >
+      <PlusIcon />
+      <T>New snippet</T>
+    </Button>
+  );
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-1.5">
+      <div className="flex items-center gap-2 px-3 pt-3 pb-2">
+        <p className="min-w-0 flex-1 text-xs text-muted-foreground">{props.runDisabledReason}</p>
+        {newSnippet}
+      </div>
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-3">
         {snippets.length === 0 && draft === null ? (
-          <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
-            <Zap aria-hidden className="size-6 text-muted-foreground/60" />
+          <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border px-6 py-10 text-center">
+            <ZapIcon aria-hidden className="size-5 text-muted-foreground" />
             <p className="text-sm font-medium">
               <T>No snippets</T>
             </p>
-            <p className="max-w-60 text-xs text-muted-foreground">
+            <p className="max-w-64 text-xs text-muted-foreground">
               <T>Save a prompt once, then run it in a side chat with one click.</T>
             </p>
           </div>
-        ) : null}
-        <ul className="flex flex-col gap-1.5">
-          {snippets.map((snippet) =>
-            draft?.id === snippet.id ? (
-              <li key={snippet.id}>
-                <SnippetForm
-                  draft={draft}
-                  onChange={setDraft}
-                  onSave={save}
-                  onCancel={() => setDraft(null)}
-                />
-              </li>
-            ) : (
-              <li
-                key={snippet.id}
-                className="flex flex-col gap-1.5 rounded-lg border border-border/60 p-2"
-              >
-                <div className="flex items-start gap-2">
+        ) : (
+          <ul className="divide-y divide-border/60 overflow-hidden rounded-xl border border-border/60">
+            {snippets.map((snippet) => {
+              if (draft?.id === snippet.id) return <li key={snippet.id}>{form(draft)}</li>;
+              const asks = snippetInputs(snippet.prompt);
+              const KindIcon = asks?.pr ? PullRequestIcon : ZapIcon;
+              return (
+                <li
+                  key={snippet.id}
+                  className="group/snippet flex gap-3 px-3 py-3 transition-colors hover:bg-accent/40 focus-within:bg-accent/40"
+                >
+                  <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                    <KindIcon aria-hidden className="size-4" />
+                  </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{snippet.name}</p>
-                    <p className="line-clamp-2 text-xs text-muted-foreground">{snippet.prompt}</p>
+                    <div className="flex items-center gap-1">
+                      <p className="min-w-0 flex-1 truncate text-sm font-medium">{snippet.name}</p>
+                      {/* Shown on hover or focus, so the list reads as names and prompts. */}
+                      <div className="flex shrink-0 opacity-0 transition-opacity group-hover/snippet:opacity-100 group-focus-within/snippet:opacity-100 pointer-coarse:opacity-100">
+                        <Button
+                          size="icon-xs"
+                          variant="ghost"
+                          aria-label={gt("Edit {name}", { name: snippet.name })}
+                          onClick={() => setDraft(snippet)}
+                        >
+                          <PencilIcon />
+                        </Button>
+                        <Button
+                          size="icon-xs"
+                          variant="ghost-destructive"
+                          aria-label={gt("Delete {name}", { name: snippet.name })}
+                          onClick={() => remove(snippet.id)}
+                        >
+                          <Trash2Icon />
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                      <SnippetPromptPreview prompt={snippet.prompt} />
+                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                      <OptionalModelPicker
+                        environmentId={props.environmentId}
+                        projectId={props.projectId}
+                        selection={snippet.modelSelection}
+                        onChange={(modelSelection) => replace({ ...snippet, modelSelection })}
+                      />
+                      <Button
+                        size="xs"
+                        variant="secondary"
+                        className="ms-auto"
+                        disabled={props.runDisabledReason !== null}
+                        title={props.runDisabledReason ?? undefined}
+                        onClick={() => run(snippet)}
+                      >
+                        <PlayIcon />
+                        {asks === null ? <T>Run</T> : <T>Run…</T>}
+                      </Button>
+                    </div>
                   </div>
-                  <Button
-                    size="icon-xs"
-                    variant="ghost"
-                    aria-label={gt("Edit {name}", { name: snippet.name })}
-                    onClick={() => setDraft(snippet)}
-                  >
-                    <PencilIcon />
-                  </Button>
-                  <Button
-                    size="icon-xs"
-                    variant="ghost"
-                    aria-label={gt("Delete {name}", { name: snippet.name })}
-                    onClick={() => remove(snippet.id)}
-                  >
-                    <Trash2Icon />
-                  </Button>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <OptionalModelPicker
-                    environmentId={props.environmentId}
-                    projectId={props.projectId}
-                    selection={snippet.modelSelection}
-                    onChange={(modelSelection) => replace({ ...snippet, modelSelection })}
-                  />
-                  <Button
-                    size="xs"
-                    className="ms-auto"
-                    disabled={props.runDisabledReason !== null}
-                    title={props.runDisabledReason ?? undefined}
-                    onClick={() => run(snippet)}
-                  >
-                    <PlayIcon />
-                    <T>Run</T>
-                  </Button>
-                </div>
-              </li>
-            ),
-          )}
-          {draft !== null && draft.id === null ? (
-            <li>
-              <SnippetForm
-                draft={draft}
-                onChange={setDraft}
-                onSave={save}
-                onCancel={() => setDraft(null)}
-              />
-            </li>
-          ) : null}
-        </ul>
+                </li>
+              );
+            })}
+            {draft !== null && draft.id === null ? <li>{form(draft)}</li> : null}
+          </ul>
+        )}
       </div>
-      <footer className="flex items-center justify-between border-t border-border/60 px-2 py-1.5">
-        <span className="text-2xs text-muted-foreground">{props.runDisabledReason}</span>
-        <Button
-          size="xs"
-          variant="outline"
-          disabled={draft !== null}
-          onClick={() => setDraft({ id: null, name: "", prompt: "" })}
-        >
-          <PlusIcon />
-          <T>New snippet</T>
-        </Button>
-      </footer>
       {asking !== null && askingInputs !== null ? (
         <SnippetRunDialog
           environmentId={props.environmentId}
@@ -167,7 +173,7 @@ function SnippetForm(props: {
   const valid = draft.name.trim() !== "" && draft.prompt.trim() !== "";
   return (
     <form
-      className="flex flex-col gap-1.5 rounded-lg border border-border p-2"
+      className="flex flex-col gap-2 bg-muted/40 p-3"
       onSubmit={(event) => {
         event.preventDefault();
         props.onSave(draft);
