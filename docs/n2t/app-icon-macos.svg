@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="n2t Code macOS app icon">
+  <defs>
+    <!-- macOS Big Sur icon grid: 824x824 body at (100,100), rx=185 -->
+    <clipPath id="macosBodyClip">
+      <rect x="100" y="100" width="824" height="824" rx="185" ry="185"/>
+    </clipPath>
+
+    <!-- Soft drop shadow below icon body, strictly inside 1024x1024 canvas -->
+    <filter id="macosShadow" x="-12%" y="-8%" width="124%" height="124%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="20" result="blurBig"/>
+      <feOffset dx="0" dy="18" result="offsetBig"/>
+      <feColorMatrix in="offsetBig" type="matrix"
+        values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.36 0" result="shadowBig"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="blurTight"/>
+      <feOffset dx="0" dy="5" result="offsetTight"/>
+      <feColorMatrix in="offsetTight" type="matrix"
+        values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.24 0" result="shadowTight"/>
+      <feMerge>
+        <feMergeNode in="shadowBig"/>
+        <feMergeNode in="shadowTight"/>
+      </feMerge>
+    </filter>
+
+    <!-- Deep navy canvas gradient -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#142133"/>
+      <stop offset="52%" stop-color="#0d1624"/>
+      <stop offset="100%" stop-color="#080e17"/>
+    </linearGradient>
+
+    <radialGradient id="vignette" cx="0.5" cy="0.5" r="0.72">
+      <stop offset="56%" stop-color="#05090f" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#04070c" stop-opacity="0.48"/>
+    </radialGradient>
+
+    <radialGradient id="tealGlow" cx="0.34" cy="0.58" r="0.52">
+      <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.25"/>
+      <stop offset="55%" stop-color="#14b8a6" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#14b8a6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="amberGlow" cx="0.76" cy="0.25" r="0.40">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.24"/>
+      <stop offset="55%" stop-color="#f59e0b" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cyanHalo" cx="0.26" cy="0.76" r="0.26">
+      <stop offset="0%" stop-color="#5eead4" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#5eead4" stop-opacity="0"/>
+    </radialGradient>
+
+    <pattern id="dotGrid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <circle cx="24" cy="24" r="2.2" fill="#475569" fill-opacity="0.24"/>
+    </pattern>
+
+    <!-- Main n2t continuous path stroke: mint-teal to cyan -->
+    <linearGradient id="markStroke" x1="224" y1="792" x2="800" y2="232" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5eead4"/>
+      <stop offset="48%" stop-color="#2dd4bf"/>
+      <stop offset="78%" stop-color="#14b8a6"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+
+    <linearGradient id="markHighlight" x1="224" y1="216" x2="800" y2="792" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ccfbf1" stop-opacity="0.34"/>
+      <stop offset="50%" stop-color="#99f6e4" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#7dd3fc" stop-opacity="0.20"/>
+    </linearGradient>
+
+    <linearGradient id="cyanRail" x1="224" y1="504" x2="392" y2="504" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#7dd3fc"/>
+    </linearGradient>
+    <linearGradient id="amberRail" x1="632" y1="392" x2="800" y2="392" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fcd34d"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+
+    <radialGradient id="tealNode" cx="0.35" cy="0.30" r="0.72">
+      <stop offset="0%" stop-color="#f0fdfa"/>
+      <stop offset="38%" stop-color="#5eead4"/>
+      <stop offset="100%" stop-color="#14b8a6"/>
+    </radialGradient>
+    <radialGradient id="amberNode" cx="0.35" cy="0.30" r="0.72">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="38%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </radialGradient>
+
+    <!-- Subtle inner specular rim for crisp separation on dark and light Docks -->
+    <linearGradient id="rimGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cbd5e1" stop-opacity="0.46"/>
+      <stop offset="32%" stop-color="#64748b" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#475569" stop-opacity="0.44"/>
+    </linearGradient>
+
+    <filter id="markShadow" x="-16%" y="-16%" width="132%" height="136%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="16" result="blur"/>
+      <feOffset dx="0" dy="14" result="offsetBlur"/>
+      <feColorMatrix in="offsetBlur" type="matrix"
+        values="0 0 0 0 0.01  0 0 0 0 0.03  0 0 0 0 0.06  0 0 0 0.65 0" result="shadow"/>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Soft drop shadow behind macOS tile -->
+  <rect x="100" y="100" width="824" height="824" rx="185" ry="185" fill="#000000" filter="url(#macosShadow)"/>
+
+  <!-- Same artwork as app-icon.svg scaled cleanly into the 824x824 body -->
+  <g clip-path="url(#macosBodyClip)">
+    <g transform="translate(100, 100) scale(0.8046875)">
+      <rect x="0" y="0" width="1024" height="1024" fill="url(#bgGrad)"/>
+      <rect x="0" y="0" width="1024" height="1024" fill="url(#dotGrid)"/>
+      <rect x="0" y="0" width="1024" height="1024" fill="url(#tealGlow)"/>
+      <rect x="0" y="0" width="1024" height="1024" fill="url(#amberGlow)"/>
+      <rect x="0" y="0" width="1024" height="1024" fill="url(#cyanHalo)"/>
+      <rect x="0" y="0" width="1024" height="1024" fill="url(#vignette)"/>
+
+      <g transform="translate(512, 512) scale(0.92) translate(-512, -512)" filter="url(#markShadow)">
+        <path d="M 224 504 L 392 504"
+              fill="none" stroke="url(#cyanRail)" stroke-width="50" stroke-linecap="round"/>
+        <path d="M 632 392 L 800 392"
+              fill="none" stroke="url(#amberRail)" stroke-width="50" stroke-linecap="round"/>
+
+        <path d="M 224 792 L 224 312 C 224 216, 384 216, 432 312 L 592 632 C 640 728, 800 728, 800 632 L 800 232"
+              fill="none" stroke="url(#markStroke)" stroke-width="82" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <path d="M 224 792 L 224 312 C 224 216, 384 216, 432 312 L 592 632 C 640 728, 800 728, 800 632 L 800 232"
+              fill="none" stroke="url(#markHighlight)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <circle cx="224" cy="792" r="56" fill="url(#tealNode)"/>
+        <circle cx="800" cy="232" r="56" fill="url(#amberNode)"/>
+        <circle cx="512" cy="472" r="44" fill="#0c131d" stroke="#5eead4" stroke-width="26"/>
+      </g>
+    </g>
+
+    <!-- Crisp subtle inner rim -->
+    <rect x="102" y="102" width="820" height="820" rx="183" ry="183"
+          fill="none" stroke="url(#rimGrad)" stroke-width="4"/>
+  </g>
+</svg>

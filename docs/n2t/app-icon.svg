@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="n2t Code app icon">
+  <defs>
+    <!-- Deep navy canvas gradient -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#142133"/>
+      <stop offset="52%" stop-color="#0d1624"/>
+      <stop offset="100%" stop-color="#080e17"/>
+    </linearGradient>
+
+    <!-- Subtle edge vignette for depth across any platform mask -->
+    <radialGradient id="vignette" cx="0.5" cy="0.5" r="0.72">
+      <stop offset="56%" stop-color="#05090f" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#04070c" stop-opacity="0.48"/>
+    </radialGradient>
+
+    <!-- Ambient teal and amber glows echoing docs/n2t/banner.svg -->
+    <radialGradient id="tealGlow" cx="0.34" cy="0.58" r="0.52">
+      <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.25"/>
+      <stop offset="55%" stop-color="#14b8a6" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#14b8a6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="amberGlow" cx="0.76" cy="0.25" r="0.40">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.24"/>
+      <stop offset="55%" stop-color="#f59e0b" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cyanHalo" cx="0.26" cy="0.76" r="0.26">
+      <stop offset="0%" stop-color="#5eead4" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#5eead4" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Subtle architectural dot grid -->
+    <pattern id="dotGrid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <circle cx="24" cy="24" r="2.2" fill="#475569" fill-opacity="0.24"/>
+    </pattern>
+
+    <!-- Main n2t continuous path stroke: mint-teal to cyan -->
+    <linearGradient id="markStroke" x1="224" y1="792" x2="800" y2="232" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5eead4"/>
+      <stop offset="48%" stop-color="#2dd4bf"/>
+      <stop offset="78%" stop-color="#14b8a6"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+
+    <!-- Delicate center highlight ridge -->
+    <linearGradient id="markHighlight" x1="224" y1="216" x2="800" y2="792" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ccfbf1" stop-opacity="0.34"/>
+      <stop offset="50%" stop-color="#99f6e4" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#7dd3fc" stop-opacity="0.20"/>
+    </linearGradient>
+
+    <!-- Secondary fork rail gradients -->
+    <linearGradient id="cyanRail" x1="224" y1="504" x2="392" y2="504" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#7dd3fc"/>
+    </linearGradient>
+    <linearGradient id="amberRail" x1="632" y1="392" x2="800" y2="392" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fcd34d"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+
+    <!-- Crisp luminous terminal node fills -->
+    <radialGradient id="tealNode" cx="0.35" cy="0.30" r="0.72">
+      <stop offset="0%" stop-color="#f0fdfa"/>
+      <stop offset="38%" stop-color="#5eead4"/>
+      <stop offset="100%" stop-color="#14b8a6"/>
+    </radialGradient>
+    <radialGradient id="amberNode" cx="0.35" cy="0.30" r="0.72">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="38%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </radialGradient>
+
+    <!-- SVG 1.1 compatible drop shadow for hero mark -->
+    <filter id="markShadow" x="-16%" y="-16%" width="132%" height="136%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="16" result="blur"/>
+      <feOffset dx="0" dy="14" result="offsetBlur"/>
+      <feColorMatrix in="offsetBlur" type="matrix"
+        values="0 0 0 0 0.01  0 0 0 0 0.03  0 0 0 0 0.06  0 0 0 0.65 0" result="shadow"/>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Full-bleed background -->
+  <rect x="0" y="0" width="1024" height="1024" fill="url(#bgGrad)"/>
+  <rect x="0" y="0" width="1024" height="1024" fill="url(#dotGrid)"/>
+  <rect x="0" y="0" width="1024" height="1024" fill="url(#tealGlow)"/>
+  <rect x="0" y="0" width="1024" height="1024" fill="url(#amberGlow)"/>
+  <rect x="0" y="0" width="1024" height="1024" fill="url(#cyanHalo)"/>
+  <rect x="0" y="0" width="1024" height="1024" fill="url(#vignette)"/>
+
+  <!-- Hero n2t geometric routing mark (safe-zone scaled for circle/squircle/square masks) -->
+  <g transform="translate(512, 512) scale(0.92) translate(-512, -512)" filter="url(#markShadow)">
+    <!-- Secondary fork rails -->
+    <path d="M 224 504 L 392 504"
+          fill="none" stroke="url(#cyanRail)" stroke-width="50" stroke-linecap="round"/>
+    <path d="M 632 392 L 800 392"
+          fill="none" stroke="url(#amberRail)" stroke-width="50" stroke-linecap="round"/>
+
+    <!-- Primary continuous n2t conduit -->
+    <path d="M 224 792 L 224 312 C 224 216, 384 216, 432 312 L 592 632 C 640 728, 800 728, 800 632 L 800 232"
+          fill="none" stroke="url(#markStroke)" stroke-width="82" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Subtle inner highlight ridge -->
+    <path d="M 224 792 L 224 312 C 224 216, 384 216, 432 312 L 592 632 C 640 728, 800 728, 800 632 L 800 232"
+          fill="none" stroke="url(#markHighlight)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Bottom-left teal terminal node -->
+    <circle cx="224" cy="792" r="56" fill="url(#tealNode)"/>
+
+    <!-- Top-right amber terminal node -->
+    <circle cx="800" cy="232" r="56" fill="url(#amberNode)"/>
+
+    <!-- Center crossover junction node -->
+    <circle cx="512" cy="472" r="44" fill="#0c131d" stroke="#5eead4" stroke-width="26"/>
+  </g>
+</svg>
