@@ -1,4 +1,4 @@
-import type { EnvironmentId, ProjectId, Snippet } from "@t3tools/contracts";
+import type { EnvironmentId, ProjectId, ScopedProjectRef, Snippet } from "@t3tools/contracts";
 import { T, useGT } from "gt-react";
 import { PencilIcon, PlayIcon, PlusIcon, Trash2Icon, Zap } from "lucide-react";
 import { useState } from "react";
@@ -9,6 +9,8 @@ import { OptionalModelPicker } from "../chat/OptionalModelPicker";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
+import { SnippetRunDialog } from "./SnippetRunDialog";
+import { snippetInputs } from "./snippetPrompt";
 
 type Draft = { readonly id: string | null; readonly name: string; readonly prompt: string };
 
@@ -20,11 +22,16 @@ export function SnippetsPanel(props: {
   readonly projectId: ProjectId | null;
   /** Why runs are off right now, such as a thread that has not started; null when they work. */
   readonly runDisabledReason: string | null;
-  readonly onRun: (snippet: Snippet) => void;
+  /** `project` is the chosen pull request's project, for snippets that ask for one. */
+  readonly onRun: (snippet: Snippet, project: ScopedProjectRef | null) => void;
 }) {
   const gt = useGT();
   const snippets = useClientSettings((settings) => settings.snippets);
   const [draft, setDraft] = useState<Draft | null>(null);
+  const [asking, setAsking] = useState<Snippet | null>(null);
+  const askingInputs = asking === null ? null : snippetInputs(asking.prompt);
+  const run = (snippet: Snippet) =>
+    snippetInputs(snippet.prompt) === null ? props.onRun(snippet, null) : setAsking(snippet);
 
   const replace = (next: Snippet) =>
     saveSnippets(snippets.map((snippet) => (snippet.id === next.id ? next : snippet)));
@@ -103,7 +110,7 @@ export function SnippetsPanel(props: {
                     className="ms-auto"
                     disabled={props.runDisabledReason !== null}
                     title={props.runDisabledReason ?? undefined}
-                    onClick={() => props.onRun(snippet)}
+                    onClick={() => run(snippet)}
                   >
                     <PlayIcon />
                     <T>Run</T>
@@ -136,6 +143,15 @@ export function SnippetsPanel(props: {
           <T>New snippet</T>
         </Button>
       </footer>
+      {asking !== null && askingInputs !== null ? (
+        <SnippetRunDialog
+          environmentId={props.environmentId}
+          snippet={asking}
+          inputs={askingInputs}
+          onRun={props.onRun}
+          onClose={() => setAsking(null)}
+        />
+      ) : null}
     </div>
   );
 }
@@ -172,6 +188,12 @@ function SnippetForm(props: {
         value={draft.prompt}
         onChange={(event) => props.onChange({ ...draft, prompt: event.target.value })}
       />
+      <p className="text-2xs text-muted-foreground">
+        {gt("Write {pr} or {notes} to choose a pull request or add notes when it runs.", {
+          pr: "{{pr}}",
+          notes: "{{notes}}",
+        })}
+      </p>
       <div className="flex justify-end gap-1.5">
         <Button type="button" size="xs" variant="ghost" onClick={props.onCancel}>
           <T>Cancel</T>

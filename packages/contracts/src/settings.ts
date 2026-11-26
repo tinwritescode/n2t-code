@@ -430,6 +430,12 @@ export const DEFAULT_SNIPPETS: ReadonlyArray<Snippet> = [
       "Use Linear to list every issue assigned to me that is not Done, Canceled, or Duplicate. Group them by state, starting with In Progress, then Todo, then Backlog. For each issue show its key, title, priority, and link. End with the one issue I should work on next and why.",
     modelSelection: null,
   },
+  {
+    id: "council-pr",
+    name: "Council review",
+    prompt: "/council opus neon4 gpt6.2sol {{pr}}\n\n{{notes}}",
+    modelSelection: null,
+  },
 ];
 
 export const ClientSettingsSchema = Schema.Struct({

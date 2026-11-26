@@ -1,5 +1,9 @@
 import { EnvironmentId, ProjectId } from "@t3tools/contracts";
-import { DEFAULT_CLIENT_SETTINGS, DEFAULT_SNIPPETS } from "@t3tools/contracts/settings";
+import {
+  DEFAULT_CLIENT_SETTINGS,
+  DEFAULT_SNIPPETS,
+  type Snippet,
+} from "@t3tools/contracts/settings";
 import { describe, expect, it, vi } from "vite-plus/test";
 import { page } from "vite-plus/test/browser";
 
@@ -9,8 +13,17 @@ import { SnippetsPanel } from "./SnippetsPanel";
 
 const environmentId = EnvironmentId.make("local");
 
-function panel(props: { runDisabledReason?: string | null; onRun?: () => void } = {}) {
-  __setClientSettingsForTests(DEFAULT_CLIENT_SETTINGS);
+function panel(
+  props: {
+    runDisabledReason?: string | null;
+    onRun?: () => void;
+    snippets?: ReadonlyArray<Snippet>;
+  } = {},
+) {
+  __setClientSettingsForTests({
+    ...DEFAULT_CLIENT_SETTINGS,
+    snippets: props.snippets ?? DEFAULT_SNIPPETS,
+  });
   return (
     <SnippetsPanel
       environmentId={environmentId}
@@ -27,9 +40,9 @@ describe("SnippetsPanel", () => {
     await using screen = await render(panel({ onRun }));
 
     await expect.element(screen.getByText("My Linear tickets")).toBeVisible();
-    await screen.getByRole("button", { name: "Run" }).click();
+    await screen.getByRole("button", { name: "Run" }).first().click();
 
-    expect(onRun).toHaveBeenCalledWith(DEFAULT_SNIPPETS[0]);
+    expect(onRun).toHaveBeenCalledWith(DEFAULT_SNIPPETS[0], null);
   });
 
   it("shows why runs are off and keeps Run disabled", async () => {
@@ -38,7 +51,7 @@ describe("SnippetsPanel", () => {
       panel({ onRun, runDisabledReason: "Side chats start after the first message." }),
     );
 
-    await expect.element(screen.getByRole("button", { name: "Run" })).toBeDisabled();
+    await expect.element(screen.getByRole("button", { name: "Run" }).first()).toBeDisabled();
     await expect
       .element(screen.getByText("Side chats start after the first message."))
       .toBeVisible();
@@ -54,7 +67,7 @@ describe("SnippetsPanel", () => {
 
     await expect.element(screen.getByText("Standup")).toBeVisible();
     expect(getClientSettings().snippets.map((snippet) => snippet.name)).toEqual([
-      "My Linear tickets",
+      ...DEFAULT_SNIPPETS.map((snippet) => snippet.name),
       "Standup",
     ]);
 
@@ -62,5 +75,28 @@ describe("SnippetsPanel", () => {
 
     await expect.element(screen.getByText("Standup")).not.toBeInTheDocument();
     expect(getClientSettings().snippets).toEqual(DEFAULT_SNIPPETS);
+  });
+
+  it("asks for notes before running a snippet that wants them", async () => {
+    const onRun = vi.fn();
+    const standup = {
+      id: "standup",
+      name: "Standup",
+      prompt: "Summarize yesterday.\n\n{{notes}}",
+      modelSelection: null,
+    };
+    await using screen = await render(panel({ onRun, snippets: [standup] }));
+
+    await screen.getByRole("button", { name: "Run" }).click();
+    await page.getByRole("textbox", { name: "Notes" }).fill("Skip the release work.");
+    // The test page has no app styles, so the modal backdrop covers the popup for pointer clicks.
+    (
+      page.getByRole("dialog").getByRole("button", { name: "Run" }).element() as HTMLElement
+    ).click();
+
+    expect(onRun).toHaveBeenCalledWith(
+      { ...standup, prompt: "Summarize yesterday.\n\nSkip the release work." },
+      null,
+    );
   });
 });

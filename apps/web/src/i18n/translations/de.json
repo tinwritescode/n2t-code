@@ -1,4 +1,9 @@
 {
+  "aec2b493d2b01445": "Notizen",
+  "8c4b36bacb7d648a": "Notizen (optional)",
+  "5410a440b485e685": "Pull Requests werden geladen…",
+  "dda90c94ea6b854d": "Keine offenen Pull Requests.",
+  "36dd3834c325f1e3": "Schreibe {pr} oder {notes}, um beim Ausführen einen Pull Request zu wählen oder Notizen hinzuzufügen.",
   "20274086885ac74f": "Upstream-Änderungen stehen im Konflikt mit {branch}. Lass sie von einem Agenten zusammenführen.",
   "1ce127daaa6f1fc1": "Upstream zusammenführen",
   "23d0ace07cfdffba": "Ein Agent führt Upstream in {branch} in {repo} zusammen, löst die Konflikte und baut T3 Code anschließend neu und installiert es erneut.",

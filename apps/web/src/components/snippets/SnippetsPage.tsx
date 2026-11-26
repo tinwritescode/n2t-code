@@ -1,15 +1,16 @@
-import type { Snippet } from "@t3tools/contracts";
+import type { ScopedProjectRef, Snippet } from "@t3tools/contracts";
 import { useGT } from "gt-react";
 
 import { isElectron } from "~/env";
 import { useScratchProject } from "~/hooks/useScratchProject";
 import { useStartPromptThread } from "~/hooks/useStartPromptThread";
+import { waitForProject } from "../../state/entities";
 import { usePrimaryEnvironmentId } from "../../state/environments";
 import { SidebarInset } from "../ui/sidebar";
 import { WorkspacePageHeader } from "../WorkspacePageHeader";
 import { SnippetsPanel } from "./SnippetsPanel";
 
-/** Snippets as a page: Run starts a new thread without a project and sends the prompt. */
+/** Snippets as a page: Run starts a new thread, without a project unless one is chosen. */
 export function SnippetsPage() {
   const gt = useGT();
   const primaryEnvironmentId = usePrimaryEnvironmentId();
@@ -17,9 +18,13 @@ export function SnippetsPage() {
   const startPromptThread = useStartPromptThread();
   const environmentId = scratchEnvironmentId(primaryEnvironmentId);
 
-  const run = (snippet: Snippet) => {
+  // A snippet run on a pull request works in that pull request's project.
+  const run = (snippet: Snippet, project: ScopedProjectRef | null) => {
     if (environmentId === null) return;
-    startPromptThread(() => openScratchProject(environmentId), {
+    const resolveProject = project
+      ? () => waitForProject(project)
+      : () => openScratchProject(environmentId);
+    startPromptThread(resolveProject, {
       title: snippet.name,
       prompt: snippet.prompt,
       modelSelection: snippet.modelSelection,

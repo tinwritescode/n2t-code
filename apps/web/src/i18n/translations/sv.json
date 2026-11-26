@@ -1,4 +1,9 @@
 {
+  "aec2b493d2b01445": "Anteckningar",
+  "8c4b36bacb7d648a": "Anteckningar (valfritt)",
+  "5410a440b485e685": "Läser in pull requests…",
+  "dda90c94ea6b854d": "Inga öppna pull requests.",
+  "36dd3834c325f1e3": "Skriv {pr} eller {notes} för att välja en pull request eller lägga till anteckningar när den körs.",
   "20274086885ac74f": "Ändringar från upstream krockar med {branch}. Slå ihop dem med en agent.",
   "1ce127daaa6f1fc1": "Slå ihop upstream",
   "23d0ace07cfdffba": "En agent slår ihop upstream i {branch} i {repo}, löser konflikterna och bygger sedan om och installerar om T3 Code.",
