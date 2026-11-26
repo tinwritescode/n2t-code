@@ -36,8 +36,8 @@ type ForkConflict = NonNullable<DesktopUpdateState["forkConflict"]>;
 // Sent to the agent as the thread's first message, not shown as app copy.
 const mergePrompt = ({ repo, branch }: ForkConflict) =>
   [
-    `Update this T3 Code fork (${repo}) from upstream. Merging upstream/main into ${branch} conflicts, so the app's updater stopped.`,
-    `1. On ${branch}, run \`git fetch upstream main && git merge upstream/main\` and resolve every conflict. Keep upstream's changes and the fork's own features (the Snippets pane, fork updates, scripts/fork).`,
+    `Update this T3 Code fork (${repo}) from origin and upstream. Merging origin/${branch} or upstream/main into ${branch} conflicts, so the app's updater stopped.`,
+    `1. On ${branch}, run \`git pull --no-rebase origin ${branch}\`, then \`git fetch upstream main && git merge upstream/main\`, and resolve every conflict. Keep upstream's changes and the fork's own features (the Snippets pane, fork updates, scripts/fork).`,
     "2. Typecheck, lint, and test the files the conflicts touched, then commit the merge and push the branch to origin.",
     "3. Last, run `scripts/fork/update.sh`. It rebuilds and reinstalls T3 Code, which quits the app and ends this thread, so report what you merged before running it.",
   ].join("\n\n");

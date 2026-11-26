@@ -6,7 +6,8 @@
 #   scripts/fork/update.sh --no-install build only and print the .app path
 #   scripts/fork/update.sh --install-only install the last build without rebuilding
 #
-# --sync exits 3 when upstream/main conflicts with this branch, after aborting the merge.
+# --sync merges origin's copy of this branch, then upstream/main, and pushes the result to origin
+# after a build. It exits 3 when either merge conflicts, after aborting it.
 # Installing writes ~/.t3/fork.json, which tells the app to update itself from this checkout.
 #
 # Each install keeps the replaced app and a copy of the database in ~/.t3/fork-backup.
@@ -28,16 +29,25 @@ for arg in "$@"; do
   esac
 done
 
-if $sync; then
-  git fetch upstream main
-  if ! git merge --no-edit upstream/main; then
+branch=$(git branch --show-current)
+
+# Merges a ref, or aborts and exits 3 when it conflicts.
+merge() {
+  if ! git merge --no-edit "$1"; then
     if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
       git merge --abort
-      echo "upstream/main conflicts with $(git branch --show-current); merge it by hand, then rerun without --sync" >&2
+      echo "$1 conflicts with $branch; merge it by hand, then rerun without --sync" >&2
       exit 3
     fi
     exit 1
   fi
+}
+
+if $sync; then
+  # The fork's commits pushed from elsewhere first, then upstream's. No access to origin skips it.
+  if git fetch origin "$branch"; then merge "origin/$branch"; fi
+  git fetch upstream main
+  merge upstream/main
 fi
 
 out="$repo/release/fork"
@@ -62,14 +72,20 @@ if [ "$(basename "$app")" != "$name.app" ]; then
   exit 1
 fi
 echo "Built: $app"
+
+if $sync && $build; then
+  git push origin "HEAD:$branch" || echo "could not push $branch to origin; push it by hand" >&2
+fi
 $install || exit 0
 
 node -e 'require("fs").writeFileSync(process.argv[1], JSON.stringify({ repo: process.argv[2], branch: process.argv[3] }) + "\n")' \
-  "$HOME/.t3/fork.json" "$repo" "$(git branch --show-current)"
+  "$HOME/.t3/fork.json" "$repo" "$branch"
 
 log="$HOME/.t3/fork-install.log"
-# Own session: quitting T3 Code closes its terminals, which would kill a child install.
-perl -MPOSIX -e 'POSIX::setsid(); exec @ARGV' /bin/bash -c '
+# Own session: quitting T3 Code closes its terminals, which would kill a child install. The
+# parent waits until the child has left this process group, because the app kills the group
+# as soon as this script exits.
+perl -MPOSIX -e 'pipe(my $r, my $w); if (fork) { close $w; <$r>; exit } close $r; POSIX::setsid(); close $w; exec @ARGV' /bin/bash -c '
   set -eu
   app=$1 name=$2
   dest="/Applications/$name.app"
@@ -85,5 +101,5 @@ perl -MPOSIX -e 'POSIX::setsid(); exec @ARGV' /bin/bash -c '
   ditto "$app" "$dest"
   open "$dest"
   echo "installed $(date)"
-' _ "$app" "$name" >"$log" 2>&1 </dev/null &
+' _ "$app" "$name" >"$log" 2>&1 </dev/null
 echo "Installing: $name will quit and reopen. Log: $log"
