@@ -1,121 +1,129 @@
 <p align="center">
-  <a href="https://t3.codes">
-    <img src="./assets/prod/t3-black-web-icon-192x192.png" width="80" height="80" alt="T3 Code logo" />
-  </a>
+  <img src="./docs/n2t/banner.svg" width="100%" alt="n2t Code — an unofficial fork based on the T3 Code source code" />
 </p>
 
-<h1 align="center">T3 Code</h1>
-
-<p align="center">The open-source control plane for coding agents.</p>
+<h1 align="center">n2t Code</h1>
 
 <p align="center">
-  <a href="https://t3.codes/download"><strong>Download</strong></a> ·
-  <a href="https://apps.apple.com/us/app/t3-code-remote-claude-more/id6787819824">iOS</a> ·
-  <a href="https://play.google.com/store/apps/details?id=com.t3tools.t3code">Android</a> ·
-  <a href="https://app.t3.codes">Web</a> ·
+  An unofficial fork based on the <a href="https://github.com/pingdotgg/t3code">T3 Code</a> source code.
+</p>
+
+<p align="center">
+  <a href="#what-this-fork-adds"><strong>Fork features</strong></a> ·
+  <a href="#install--update-this-fork">Install &amp; update</a> ·
+  <a href="#run-from-source">Run from source</a> ·
   <a href="./docs/README.md">Docs</a> ·
-  <a href="https://discord.gg/jn4EGJjrvv">Discord</a>
+  <a href="https://github.com/pingdotgg/t3code">Upstream</a>
 </p>
 
-<p align="center">
-  <a href="https://t3.codes">
-    <img src="./.github/readme/hero.webp" width="100%" alt="T3 Code on desktop with a finished Claude thread, next to the phone app asking to approve a command from Codex" />
-  </a>
-</p>
+> [!IMPORTANT]
+> **Unofficial fork:** **n2t Code** ([`tinwritescode/n2t-code`](https://github.com/tinwritescode/n2t-code)) is a personal, unofficial fork based on the T3 Code source code. It is **not** affiliated with, endorsed by, or maintained by T3 Tools, Inc. See [Trademarks](#trademarks) and [`TRADEMARK.md`](./TRADEMARK.md).
 
-T3 Code runs the coding agents on your machine and gives them one fast interface. Start a thread at your desk, then approve the next step from your phone.
+**n2t Code** runs the coding agents already installed on your machine and gives them one fast interface across desktop, web, and remote sessions. Start a thread at your desk, review diffs, or approve the next step from another device.
 
-It works with Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx, and any [ACP](./docs/user/providers-acp.md) agent. If an agent is set up on your computer, T3 Code can control it.
+It works with Claude Code, Codex, Cursor, OpenCode, Grok Build, Antigravity, Kiro, Pi, Muse Code, fx, and any [ACP](./docs/user/providers-acp.md) agent. If an agent CLI is set up on your computer, n2t Code can drive it.
 
 ## What you get
 
-- **Your subscriptions.** T3 Code does not resell tokens. It drives the agents you are already signed in to.
-- **Every agent in one place.** Change models in the middle of a thread. Let Claude hand a task to Codex.
-- **Desktop, web, and phone.** One server, and every client shows the same threads. There are apps for iOS and Android.
-- **Remote ready.** Run agents on any machine. Connect over your local network, Tailscale, or [T3 Connect](./docs/user/remote-access.md).
-- **Git built in.** Each thread can work in its own worktree. Review the diff, then commit, push, and open a pull request with one button.
-- **Fast.** Performance is a feature here. We measure it, and we treat a dropped frame as a bug.
-- **Open.** Source code is MIT licensed. If you don't like something, fork it under your own branding (see [Trademarks and forks](#trademarks-and-forks)).
+- **Your subscriptions.** n2t Code does not resell tokens. It drives the coding agents you are already signed in to.
+- **Every agent in one place.** Switch models in the middle of a thread or hand work between agents.
+- **Desktop, web, and remote ready.** Run one server and connect locally, over your network, or over Tailscale (see [remote access](./docs/user/remote-access.md)).
+- **Git built in.** Give each thread its own worktree, inspect diffs, and commit, push, or open pull requests directly from the app.
+- **Open source.** The source code is MIT licensed under [`LICENSE`](./LICENSE).
 
-## Install
+## What this fork adds
 
-### Desktop app
+### Recent threads view (boring sidebar)
 
-[Download T3 Code](https://t3.codes/download) for macOS, Windows, or Linux. You can also use a package manager:
+<p align="center">
+  <img src="./docs/n2t/recent-threads.svg" width="100%" alt="Comparison of grouped project folders and the flat Recent threads list in the boring sidebar" />
+</p>
 
-| Platform       | Command                                                              |
-| -------------- | -------------------------------------------------------------------- |
-| macOS          | `brew install --cask t3-code`                                        |
-| Windows        | `winget install T3Tools.T3Code` or `scoop install extras/t3code`     |
-| Arch Linux     | `yay -S t3code-bin`                                                  |
-| Nix            | `nix profile add github:NixOS/nixpkgs/nixos-unstable#t3code`         |
-| Debian, Ubuntu | `.deb` from [Releases](https://github.com/pingdotgg/t3code/releases) |
+- Adds a **Recent threads** toggle button (History icon) to the sidebar header when boring-sidebar mode is enabled.
+- Swaps grouped project folders for one flat list of active threads sorted by latest send; clicking it again restores the folder view.
+- Persists your view choice per device, hides when there are no projects, and clears selection while scrolling back to the top when switching views.
 
-### Command line
+### Snippets with live pull request search
 
-This installs the `t3` command. Run `t3` to start the server and open the web app.
+<p align="center">
+  <img src="./docs/n2t/snippets.svg" width="100%" alt="Snippets panel showing structured PR and Notes slots and the interactive pull request search run dialog" />
+</p>
+
+- **Saved prompts everywhere.** Manage reusable prompts in client settings, each with its own model override (or set to follow the current thread's model). Run them as a side chat from the **Snippets** tab in the right panel, or launch a fresh thread from the **Snippets** page next to Pull requests in the sidebar.
+- **Interactive slots & PR search.** Prompts containing `{{pr}}` or `{{notes}}` display those placeholders as structured slots and open a run dialog (`Run…`) before starting. Typing in the pull request search box narrows loaded open pull requests immediately and queries the host after a 250 ms pause to reach pull requests beyond the first page. Running a PR snippet starts the thread in that pull request's project.
+- **Built-in defaults.** Ships with **My Linear tickets** and **Council review** snippets out of the box, with hover/focus edit and delete controls.
+
+### In-app fork updater & upstream sync
+
+<p align="center">
+  <img src="./docs/n2t/fork-updater.svg" width="100%" alt="Sidebar fork updater progress states and the scripts/fork/update.sh build and conflict recovery flow" />
+</p>
+
+- **Updates from your checkout.** When a packaged build finds `~/.t3/fork.json`, it checks how many commits `upstream/main` is ahead of your branch and rebuilds through [`scripts/fork/update.sh`](./scripts/fork/update.sh) instead of pulling from an external release feed.
+- **Sidebar progress readout.** Streams step percentages from the update script directly into the sidebar update indicator as a progress ring and percent label.
+- **Agent-assisted conflict resolution.** When a synced merge conflicts, the script aborts cleanly (exit code `3`) and the sidebar update button turns into a merge button with a model picker, starting an agent thread in your fork checkout to resolve the conflict, rebuild, and reinstall.
+- **Daily upstream sync PR.** [`.github/workflows/sync-upstream.yml`](./.github/workflows/sync-upstream.yml) opens a daily pull request syncing `pingdotgg/t3code:main` into `custom` whenever upstream has new commits.
+
+## Install / update this fork
+
+### Prerequisites
+
+- Node.js and `pnpm` (see [first checkout](./docs/operations/00_development.md#first-checkout))
+- At least one coding agent installed and signed in — for example, [Claude Code](https://claude.com/product/claude-code) (`claude auth login`) or [Codex CLI](https://developers.openai.com/codex/cli) (`codex login`). See [provider setup](./docs/user/install.md#providers) for the full list.
+
+### Clone and configure remotes
 
 ```bash
-curl -fsSL https://t3.codes/install.sh | sh
+git clone https://github.com/tinwritescode/n2t-code.git
+cd n2t-code
+git remote add upstream https://github.com/pingdotgg/t3code.git
 ```
 
-On Windows, in PowerShell:
+### Build and install on macOS
 
-```powershell
-irm https://t3.codes/install.ps1 | iex
+Use [`scripts/fork/update.sh`](./scripts/fork/update.sh) to build the desktop `.app` (using the `dir` target to skip slow DMG/zip packaging), swap it into `/Applications`, and relaunch:
+
+```bash
+# Build the current checkout, install into /Applications, and relaunch
+./scripts/fork/update.sh
+
+# Merge origin/<branch> and upstream/main first, rebuild, push to origin, and install
+./scripts/fork/update.sh --sync
+
+# Build only and print the resulting .app path
+./scripts/fork/update.sh --no-install
+
+# Install the last build without rebuilding
+./scripts/fork/update.sh --install-only
 ```
 
-To try it once without an install, run `npx t3@latest`.
+Notes on how the installer behaves:
 
-### Phone
+- Installing writes `~/.t3/fork.json` with your checkout path and branch so the packaged app can update itself from the sidebar.
+- Each install moves the replaced `.app` and copies `statev2.sqlite*` into timestamped backups under `~/.t3/fork-backup`.
+- The swap runs in its own detached session so quitting and relaunching works even when triggered from the app's own terminal.
+- `--sync` aborts any conflicted merge and exits with code `3` so you can resolve it manually (or via the in-app agent merge button) and rerun without `--sync`.
 
-Get the app from the [App Store](https://apps.apple.com/us/app/t3-code-remote-claude-more/id6787819824) or [Google Play](https://play.google.com/store/apps/details?id=com.t3tools.t3code). Then follow [remote access](./docs/user/remote-access.md) to connect it to your computer.
+## Run from source
 
-### Sign in to an agent
-
-T3 Code needs one agent that is installed and signed in. For example, install [Claude Code](https://claude.com/product/claude-code) and run `claude auth login`, or install [Codex CLI](https://developers.openai.com/codex/cli) and run `codex login`.
-
-[Provider setup](./docs/user/install.md#providers) has the steps for each agent. [Install T3 Code](./docs/user/install.md) covers nightly builds, AppImage, WSL, and NixOS.
-
-## "Wait, what are you selling me?"
-
-Nothing. We built T3 Code because we wanted the best possible development experience with agents. We were inspired by existing solutions like the Codex desktop app, Conductor, Claude Desktop and Cursor Glass, but none met our bar.
-
-We wanted something performant, remote-ready, and truly open. If we ever go the wrong direction, we want you to have everything you need to fork the source code and build the tool that you want, under your own name and branding.
+To run the web and server dev environment locally without packaging a desktop build, follow the [development runbook](./docs/operations/00_development.md#first-checkout).
 
 ## Documentation
 
 - [Install and first run](./docs/user/install.md)
-- [Remote access from a phone or another machine](./docs/user/remote-access.md)
+- [Remote access from another device](./docs/user/remote-access.md)
 - [Permission modes](./docs/user/permission-modes.md)
 - [Source control](./docs/user/source-control.md)
 - [Connect outside agents over MCP](./docs/user/outside-agents.md)
-- [FAQ](./docs/user/faq.md)
-
-[All docs](./docs/README.md) has the full list.
-
-## Contributing
-
-We have limited review capacity. Small, focused fixes are the most likely to be merged. Features need an approved discussion first.
-
-- Read [CONTRIBUTING.md](./CONTRIBUTING.md) before you report a bug or open a pull request.
-- Put feature requests in [Ideas](https://github.com/pingdotgg/t3code/discussions/categories/ideas).
-- Build from source with the [development runbook](./docs/operations/00_development.md#first-checkout). The [architecture overview](./docs/internals/01_architecture.md) explains how it works.
-- Get help in [Discord](https://discord.gg/jn4EGJjrvv).
+- [Architecture overview](./docs/internals/01_architecture.md)
+- [All docs](./docs/README.md)
 
 ## License
 
-The source code in this repository is licensed under the [MIT License](./LICENSE).
+The source code in this repository is licensed under the [MIT License](./LICENSE). The MIT License applies **only to the source code**.
 
-## Trademarks and forks
+## Trademarks
 
-The MIT license applies **only to the source code**. It does not grant any rights to T3 Tools, Inc.'s trademarks, branding, or trade dress, including the **T3 Code** name, wordmark, logos, and application icons.
+This project is an unofficial fork based on the [T3 Code](https://github.com/pingdotgg/t3code) source code and is **not** affiliated with, endorsed by, or maintained by T3 Tools, Inc.
 
-If you fork, redistribute, or build on T3 Code's source code:
-
-- **Use your own branding.** Replace the T3 Code name, wordmark, logos, and application icons in any public fork, redistributed build, website, package, or app store listing.
-- **Be explicitly clear that your project is unofficial.** Do not use the T3 Code name, wordmark, logo, or branding in your own projects without making it unmistakably clear that your project is unofficial and not affiliated with or endorsed by T3 Tools, Inc.
-
-Using our name, wordmark, logo, or branding in a way that suggests official status or affiliation is trademark infringement and unlawful. **Any project indicating or implying that it is an official version of T3 Code when it is not will be pursued to the full extent of the law.**
-
-See [TRADEMARK.md](./TRADEMARK.md) for the full trademark and branding policy.
+The MIT License does not grant any rights to T3 Tools, Inc.'s trademarks, service marks, trade names, trade dress, or branding (including the T3 Code name, wordmarks, logos, and icons). See [`TRADEMARK.md`](./TRADEMARK.md) for the upstream trademark and branding policy.
