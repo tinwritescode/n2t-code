@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rebuilds this fork as "T3 Code (Nightly).app" and swaps it into /Applications.
+# Rebuilds this fork as "n2t Code.app" and swaps it into /Applications.
 #
 #   scripts/fork/update.sh              build the current checkout, install, relaunch
 #   scripts/fork/update.sh --sync       merge upstream/main first
@@ -60,8 +60,8 @@ if $build; then
   progress 25 "Installing dependencies"
   pnpm install --frozen-lockfile --yes
 
-  # A -nightly.<date>.<n> version names the app "T3 Code (Nightly)", so it replaces the official
-  # nightly in place. Local builds carry no update feed, so the app never updates itself away.
+  # A -nightly.<date>.<n> version names the app "n2t Code". Local builds carry no update feed,
+  # so the app never updates itself away.
   base=$(node -p 'const [a, b, c] = require("./apps/desktop/package.json").version.split(/[.-]/); `${a}.${b}.${Number(c) + 1}`')
   version="$base-nightly.$(date +%Y%m%d).$(git rev-list --count HEAD)"
   arch=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo x64)
@@ -73,7 +73,7 @@ if $build; then
 fi
 
 app=$(find "$out" -maxdepth 3 -name '*.app' -type d | head -1)
-name="T3 Code (Nightly)"
+name="n2t Code"
 if [ "$(basename "$app")" != "$name.app" ]; then
   echo "expected $name.app, built: ${app:-nothing}" >&2
   exit 1
@@ -96,12 +96,16 @@ log="$HOME/.t3/fork-install.log"
 perl -MPOSIX -e 'pipe(my $r, my $w); if (fork) { close $w; <$r>; exit } close $r; POSIX::setsid(); close $w; exec @ARGV' /bin/bash -c '
   set -eu
   app=$1 name=$2
+  # Builds before the rename installed as "T3 Code (Nightly)"; both apps share ~/.t3, so it quits too.
+  legacy="T3 Code (Nightly)"
   dest="/Applications/$name.app"
   backup="$HOME/.t3/fork-backup"
-  running() { [ "$(osascript -e "application \"$name\" is running")" = true ]; }
-  if running; then osascript -e "quit app \"$name\""; fi
-  # Waits through any quit confirmation T3 Code shows.
-  while running; do sleep 1; done
+  running() { [ "$(osascript -e "application \"$1\" is running")" = true ]; }
+  for target in "$name" "$legacy"; do
+    if running "$target"; then osascript -e "quit app \"$target\""; fi
+    # Waits through any quit confirmation the app shows.
+    while running "$target"; do sleep 1; done
+  done
   stamp=$(date +%Y%m%d-%H%M%S)
   mkdir -p "$backup/db-$stamp"
   cp -f "$HOME"/.t3/userdata/statev2.sqlite* "$backup/db-$stamp"/ 2>/dev/null || true
