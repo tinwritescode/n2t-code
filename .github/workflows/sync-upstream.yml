@@ -41,6 +41,7 @@ jobs:
           fi
           gh api "repos/$REPO/pulls" \
             -f base="$BASE" -f head="$HEAD" \
+            -F maintainer_can_modify=false \
             -f title="Sync upstream pingdotgg/t3code ($ahead commits)" \
             -f body="Automated sync from upstream \`main\`. Merge with **Create a merge commit** so the next sync starts from this history." \
             -q '.html_url'
