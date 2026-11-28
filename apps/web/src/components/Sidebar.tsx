@@ -1975,6 +1975,7 @@ export default function Sidebar({ routeReveal }: { routeReveal: SidebarRouteReve
       }
     })();
   };
+  const attemptPinStable = useStableCallback(attemptPin);
   const attemptUnpin = (threadRef: ScopedThreadRef) => {
     void (async () => {
       const result = await confirmAndUnpinThread(threadRef);
@@ -3683,6 +3684,7 @@ export default function Sidebar({ routeReveal }: { routeReveal: SidebarRouteReve
                           onUnsettle={attemptUnsettle}
                           onSnooze={attemptSnooze}
                           onUnsnooze={attemptUnsnooze}
+                          onPin={attemptPinStable}
                           onUnpin={attemptUnpin}
                           onAcknowledgeWoke={acknowledgeWoke}
                           onFileDropThreads={handleThreadFileDrop}
